@@ -23,6 +23,7 @@ Object::Object(QDataStream &stream)
 
 Object::~Object()
 {
+    qDebug() << "delete" << this << name();
 }
 
 void Object::setId(quint64 id)
@@ -56,10 +57,28 @@ void Object::setParent(Object *parent)
     QObject::setParent(parent);
 }
 
-void Object::addChild(Object* child)
+void Object::addChild(Object* child, int pos)
 {
-    if (child) {
+    if (!child) return;
+    if (pos == -1) {
         child->setParent(this);
+    } else {
+        QList<Object*> childs;
+        blockSignals(true);
+        for (Object* c : children()) {
+            c->setParent(0);
+            childs << c;
+        }
+        childs.insert(pos, child);
+        for (Object* c : children()) {
+            if (c == child) {
+                blockSignals(false);
+                c->setParent(this);
+                blockSignals(true);
+            }
+            c->setParent(this);
+        }
+        blockSignals(false);
     }
 }
 
@@ -104,19 +123,6 @@ int Object::row() const
     }
 }
 
-
-bool Object::insertChildren(int position, int count, int columns)
-{
-    if (position < 0 || position > children().size())
-        return false;
-
-    for (int row = 0; row < count; ++row) {
-        new Spline(this);
-    }
-
-    return true;
-}
-
 bool Object::removeChildren(int position, int count)
 {
     if (position < 0 || position + count > children().size())
@@ -143,6 +149,8 @@ Object* Object::deserialize(QDataStream &stream)
 {
     QString classname;
     stream >> classname;
+
+    qDebug() << "deserialize: " << classname;
 
     if (classname == "Object") return new Object(stream);
     else if (classname == "Root") return new Root(stream);

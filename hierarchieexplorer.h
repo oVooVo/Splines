@@ -15,6 +15,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 
 
 private:

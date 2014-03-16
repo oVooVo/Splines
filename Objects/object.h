@@ -28,7 +28,7 @@ public:
     QList<Object *> children() const;
     Object* parent() const;
     void setParent(Object *parent);
-    void addChild(Object* child);
+    void addChild(Object* child, int pos);
 
     //---------------
     // Tree item
@@ -64,7 +64,7 @@ protected:
     //------------------
     // serilization
     //------------------
-protected:
+public:
     virtual void serialize(QDataStream& stream) const;
     static Object* deserialize(QDataStream& stream);
     friend QDataStream& operator<<(QDataStream& stream, const Object* o);

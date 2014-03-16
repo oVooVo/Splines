@@ -4,7 +4,7 @@ Spline::Spline(Object *parent) : Object(parent)
 {
 }
 
-Spline::Spline(QDataStream &stream)
+Spline::Spline(QDataStream &stream) : Object(stream)
 {
     Q_UNUSED(stream);
 }

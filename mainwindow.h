@@ -23,9 +23,16 @@ public:
 public slots:
     void addSpline();
 
+    void save();
+    void saveAs();
+    void load();
+
 private:
     Ui::MainWindow *ui;
     Scene* _scene;
+    QString _filepath;
+    QString fileDialogDirectory() const;
+
 };
 
 #endif // MAINWINDOW_H

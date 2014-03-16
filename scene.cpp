@@ -4,9 +4,16 @@
 #include <QStringList>
 #include <QMimeData>
 
+QList<QModelIndex> Scene::_draggedObjects;
+
 Scene::Scene()
 {
     _root = new Root();
+}
+
+Scene::Scene(Root *root)
+{
+    _root = root;
 }
 
 Scene::~Scene()
@@ -139,10 +146,11 @@ void Scene::insertRows(int position, const QModelIndex &parent, QList<Object*> o
 {
     Object* parentObject = getObject(parent);
 
+    for (Object* o : objects)
+        parentObject->addChild(o, position);
+    qDebug() << parent << position << objects.size();
     beginInsertRows(parent, position, position + objects.size() - 1);
     endInsertRows();
-    for (Object* o : objects)
-        o->setParent(parentObject);
 }
 
 bool Scene::removeRows(int position, int rows, const QModelIndex &parent)
@@ -185,32 +193,67 @@ QMimeData *Scene::mimeData(const QModelIndexList &indexes) const
 
     QDataStream stream(&encodedData, QIODevice::ReadWrite);
 
+    QList<Object*> objects;
+
+    _draggedObjects.clear();
     foreach (const QModelIndex &index, indexes) {
         if (index.isValid()) {
-            stream << getObject(index);
+            objects << getObject(index);
+            _draggedObjects << index;
         }
     }
+
+    stream << objects;
 
     mimeData->setData("application/Object", encodedData);
     return mimeData;
 }
 
+
 bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
+    if (action == Qt::IgnoreAction)
+        return true;
+
+    if (action != Qt::MoveAction && action != Qt::CopyAction)
+        return false;
+
+    if (!data->hasFormat("application/Object"))
+        return false;
+
+    if (column > 0)
+        return false;
+
+
+    QList<Object*> dropped;
     QByteArray encodedObject = data->data("application/Object");
     QDataStream stream(&encodedObject, QIODevice::ReadOnly);
-    Object* dropped = 0;
-
     stream >> dropped;
-    insertRow(row, parent, dropped);
-    return true;
+    for (Object* o : dropped) {
+        qDebug() << row;
+        insertRow(row, parent, o);
+    }
+    if (action == Qt::MoveAction) {
+        for (QModelIndex i : _draggedObjects)
+            removeObject(i);
+    }
+    return false;
 }
 
 
+QDataStream& operator<<(QDataStream& out, const Scene* s)
+{
+    s->_root->serialize(out);
+    return out;
+}
 
-
-
-
+QDataStream& operator>>(QDataStream& in, Scene* &s)
+{
+    Object* root = Object::deserialize(in);
+    Q_ASSERT_X(QString(root->metaObject()->className()) == "Root", "Scene operator>>", "root is not of type Root");
+    s = new Scene((Root*) root);
+    return in;
+}
 
 
 

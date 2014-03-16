@@ -8,6 +8,8 @@ HierarchieExplorer::HierarchieExplorer(QWidget *parent) :
     setSelectionBehavior(QAbstractItemView::SelectItems);
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+    setExpandsOnDoubleClick(true);
+
     setDefaultDropAction(Qt::MoveAction);
     setDragEnabled(true);
     setAcceptDrops(true);
@@ -26,4 +28,10 @@ void HierarchieExplorer::deleteSelected()
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
         model()->removeObject(index);
     }
+}
+
+void HierarchieExplorer::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << model()->getObject(indexAt(event->pos()))->name();
+    QTreeView::mousePressEvent(event);
 }

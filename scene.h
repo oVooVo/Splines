@@ -7,11 +7,16 @@
 #include "Objects/root.h"
 #include <QQueue>
 #include <QAbstractItemModel>
+#include <QDataStream>
+
 class Scene : public QAbstractItemModel
 {
     Q_OBJECT
 public:
     explicit Scene();
+private:
+    explicit Scene(Root* root);
+public:
     ~Scene();
 
     //------------
@@ -20,6 +25,7 @@ public:
 public:
     void addObject(Object* o);
     void removeObject(QModelIndex index);
+    Object* root() const { return _root; }
 private:
     Root* _root;
     quint64 _objectCounter = 0;
@@ -52,6 +58,7 @@ protected:
                     const QModelIndex &parent = QModelIndex());
     void insertRow(int position, const QModelIndex &parent, Object* object);
     void insertRows(int position, const QModelIndex &parent, QList<Object*> objects);
+public:
     Object *getObject(const QModelIndex &index) const;
 
     //-----------
@@ -63,6 +70,18 @@ public:
     QStringList mimeTypes() const;
     QMimeData* mimeData(const QModelIndexList &indexes) const;
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+private:
+    static QList<QModelIndex> _draggedObjects;
+
+
+protected:
+    friend QDataStream& operator<<(QDataStream& out, const Scene* s);
+    friend QDataStream& operator>>(QDataStream& in, Scene* &s);
+
+
 };
+
+QDataStream& operator<<(QDataStream& out, const Scene* s);
+QDataStream& operator>>(QDataStream& in, Scene* &s);
 
 #endif // SCENE_H

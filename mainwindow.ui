@@ -39,6 +39,9 @@
     <property name="title">
      <string>Datei</string>
     </property>
+    <addaction name="actionSpeichern"/>
+    <addaction name="actionSpeichern_unter"/>
+    <addaction name="action_ffnen"/>
    </widget>
    <widget class="QMenu" name="menuObjekte">
     <property name="title">
@@ -94,6 +97,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSpeichern">
+   <property name="text">
+    <string>Speichern</string>
+   </property>
+  </action>
+  <action name="actionSpeichern_unter">
+   <property name="text">
+    <string>Speichern unter ...</string>
+   </property>
+  </action>
+  <action name="action_ffnen">
+   <property name="text">
+    <string>Öffnen</string>
    </property>
   </action>
  </widget>
