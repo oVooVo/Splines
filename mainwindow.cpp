@@ -25,5 +25,5 @@ MainWindow::~MainWindow()
 
 void MainWindow::addSpline()
 {
-    _scene->addObject(new Spline());
+    _scene->addObject(new Object());
 }

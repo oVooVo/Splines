@@ -1,9 +1,24 @@
 #include "object.h"
 #include <QVariant>
+#include "spline.h"
+#include <QDebug>
+#include "root.h"
+#include "spline.h"
 
 Object::Object(Object *parent) : QObject(parent)
 {
     _name = genericName();
+}
+
+Object::Object(QDataStream &stream)
+{
+    stream >> _name;
+    stream >> _id;
+    QList<Object*> children;
+    stream >> children;
+    for (Object* o : children) {
+        o->setParent(this);
+    }
 }
 
 Object::~Object()
@@ -56,6 +71,7 @@ QString Object::genericName() const
 
 Object* Object::child(int row) const
 {
+    if (row >= childCount() || row < 0) return 0;
     return children()[row];
 }
 
@@ -89,8 +105,62 @@ int Object::row() const
 }
 
 
+bool Object::insertChildren(int position, int count, int columns)
+{
+    if (position < 0 || position > children().size())
+        return false;
 
+    for (int row = 0; row < count; ++row) {
+        new Spline(this);
+    }
 
+    return true;
+}
 
+bool Object::removeChildren(int position, int count)
+{
+    if (position < 0 || position + count > children().size())
+        return false;
+
+    for (int row = 0; row < count; ++row)
+        delete children()[position];
+
+    return true;
+}
+
+void Object::serialize(QDataStream &stream) const
+{
+    //class name
+    stream << QString(metaObject()->className());
+
+    //object attributes
+    stream << name();
+    stream << id();
+    stream << children();
+}
+
+Object* Object::deserialize(QDataStream &stream)
+{
+    QString classname;
+    stream >> classname;
+
+    if (classname == "Object") return new Object(stream);
+    else if (classname == "Root") return new Root(stream);
+    else if (classname == "Spline") return new Spline(stream);
+    qDebug() << "Warning: Classname " << classname << "not found.";
+    return 0;
+}
+
+QDataStream& operator<<(QDataStream& stream, const Object* o)
+{
+    o->serialize(stream);
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, Object* &o)
+{
+    o = Object::deserialize(stream);
+    return stream;
+}
 
 

@@ -10,6 +10,7 @@ class Spline : public Object
     Q_OBJECT
 public:
     Spline(Object* parent = 0);
+    Spline(QDataStream& stream);
     void addPiece(SplinePiece* p) { pieces << p; }
     QPointF operator() (qreal t) const;
 

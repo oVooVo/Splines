@@ -1,43 +1,41 @@
 #include "scene.h"
 #include <QDebug>
+#include "Objects/spline.h"
+#include <QStringList>
+#include <QMimeData>
 
 Scene::Scene()
 {
     _root = new Root();
 }
 
+Scene::~Scene()
+{
+    delete _root;
+}
+
 void Scene::addObject(Object *o)
 {
     if (!_freeIds.isEmpty()) {
-        o->setId(_freeIds.pop());
+        o->setId(_freeIds.dequeue());
+    } else {
+        o->setId(_objectCounter++); //yes, post decrement!
     }
-    o->setId(_objectCounter);
-    _objectCounter++;
     _objects.insert(o->id(), o);
 
-    if (!o->parent())
-        o->setParent(_root);
-
-    QModelIndex pi = createIndex(0, 0, _root);
-    beginInsertRows(pi, 0, _root->childCount());
-    QModelIndex index = createIndex(o->row(), 0, o);
-    setData(index, o->name(), Qt::DisplayRole);
-    dataChanged(index, index);
+    beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
+    o->setParent(_root);
     endInsertRows();
 }
 
-void Scene::removeObject(Object *o)
+void Scene::removeObject(QModelIndex index)
 {
-    if (_objects.values().contains(o))
-        removeObject(_objects.key(o));
-}
-
-void Scene::removeObject(quint64 id)
-{
-    if (_objects.keys().contains(id)) {
-        _freeIds.push(id);
-        _objects.remove(id);
-    }
+    Q_ASSERT_X(index.isValid(), "Scene::removeObject", "Trying to delete root or indexless object");
+    Object* o = getObject(index);
+    beginRemoveRows(index.parent(), o->row(), o->row());
+    _freeIds.enqueue(o->id());
+    delete o;
+    endRemoveRows();
 }
 
 void Scene::draw(QPainter &painter)
@@ -47,45 +45,38 @@ void Scene::draw(QPainter &painter)
     }
 }
 
-QVariant Scene::data(const QModelIndex &index, int role) const
+Object *Scene::getObject(const QModelIndex &index) const
 {
-    if (!index.isValid())
-        return QVariant();
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-    Object* o = static_cast<Object*>(index.internalPointer());
-    qDebug() << "return " <<  o->data(index.column());
-    return o->data(index.column());
+    if (index.isValid()) {
+        Object* item = static_cast<Object*>(index.internalPointer());
+        if (item) return item;
+    }
+    return _root;
 }
 
-Qt::ItemFlags Scene::flags(const QModelIndex &index) const
+int Scene::rowCount(const QModelIndex &parent) const
 {
-    if (!index.isValid()) return 0;
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    Object *parentItem = getObject(parent);
+
+    return parentItem->childCount();
 }
 
-QVariant Scene::headerData(int section, Qt::Orientation orientation, int role) const
+int Scene::columnCount(const QModelIndex & /* parent */) const
 {
-    if (orientation == Qt::Horizontal && role== Qt::DisplayRole)
-        return _root->data(section);
-    return QVariant();
+    return _root->columnCount();
 }
 
 QModelIndex Scene::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!hasIndex(row, column, parent))
+    if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
 
-    Object* parentObject;
-    if (!parent.isValid())
-        parentObject = _root;
-    else
-        parentObject = static_cast<Object*>(parent.internalPointer());
+    Object* parentItem = getObject(parent);
 
-    Object* childObject = parentObject->child(row);
-    if (childObject)
-        return createIndex(row, column, childObject);
+    Object* childItem = parentItem->child(row);
+
+    if (childItem)
+        return createIndex(row, column, childItem);
     else
         return QModelIndex();
 }
@@ -95,46 +86,125 @@ QModelIndex Scene::parent(const QModelIndex &index) const
     if (!index.isValid())
         return QModelIndex();
 
-    Object* parentObject =
-            (static_cast<Object*>(index.internalPointer()))->parent();
+    Object* childItem = getObject(index);
+    Object* parentItem = childItem->parent();
 
-    if (parentObject == _root)
+    if (parentItem == _root)
         return QModelIndex();
 
-    return createIndex(parentObject->row(), 0, parentObject);
+    return createIndex(parentItem->row(), 0, parentItem);
 }
 
-int Scene::rowCount(const QModelIndex &parent) const
+
+QVariant Scene::data(const QModelIndex &index, int role) const
 {
-    Object* parentObject;
-    if (parent.column() > 0)
-        return 0;
+    if (!index.isValid())
+        return QVariant();
 
-    if (!parent.isValid())
-        parentObject = _root;
-    else
-        parentObject = static_cast<Object*>(parent.internalPointer());
+    if (role != Qt::DisplayRole && role != Qt::EditRole)
+        return QVariant();
 
-    return parentObject->childCount();
+    Object* item = getObject(index);
+
+    return item->data(index.column());
 }
 
-int Scene::columnCount(const QModelIndex &parent) const
+QVariant Scene::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (parent.isValid())
-        return static_cast<Object*>(parent.internalPointer())->columnCount();
-    else
-        return _root->columnCount();
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+        return _root->data(section);
+
+    return QVariant();
+}
+
+bool Scene::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role != Qt::EditRole)
+        return false;
+
+    Object* item = getObject(index);
+    item->setName(value.toString());
+    return true;
+}
+
+void Scene::insertRow(int position, const QModelIndex &parent, Object* object)
+{
+    QList<Object*> objects;
+    objects << object;
+    insertRows(position, parent, objects);
 }
 
 
+void Scene::insertRows(int position, const QModelIndex &parent, QList<Object*> objects)
+{
+    Object* parentObject = getObject(parent);
 
+    beginInsertRows(parent, position, position + objects.size() - 1);
+    endInsertRows();
+    for (Object* o : objects)
+        o->setParent(parentObject);
+}
 
+bool Scene::removeRows(int position, int rows, const QModelIndex &parent)
+{
+    Object* parentItem = getObject(parent);
+    bool success = true;
 
+    beginRemoveRows(parent, position, position + rows - 1);
+    success = parentItem->removeChildren(position, rows);
+    endRemoveRows();
 
+    return success;
+}
 
+Qt::DropActions Scene::supportedDropActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction;
+}
 
+Qt::ItemFlags Scene::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags def = Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | QAbstractItemModel::flags(index);
+    if (index.isValid()) {
+        def |= Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
+    return def;
+}
 
+QStringList Scene::mimeTypes() const
+{
+    QStringList types;
+    types << QString("application/Object");
+    return types;
+}
 
+QMimeData *Scene::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encodedData;
+
+    QDataStream stream(&encodedData, QIODevice::ReadWrite);
+
+    foreach (const QModelIndex &index, indexes) {
+        if (index.isValid()) {
+            stream << getObject(index);
+        }
+    }
+
+    mimeData->setData("application/Object", encodedData);
+    return mimeData;
+}
+
+bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    QByteArray encodedObject = data->data("application/Object");
+    QDataStream stream(&encodedObject, QIODevice::ReadOnly);
+    Object* dropped = 0;
+
+    stream >> dropped;
+    insertRow(row, parent, dropped);
+    return true;
+}
 
 
 

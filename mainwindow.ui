@@ -54,7 +54,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -71,7 +71,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTreeView" name="treeView"/>
+      <widget class="HierarchieExplorer" name="treeView"/>
      </item>
     </layout>
    </widget>
@@ -92,6 +92,9 @@
    <property name="text">
     <string>Spline</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -101,6 +104,11 @@
    <extends>QWidget</extends>
    <header>viewport.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HierarchieExplorer</class>
+   <extends>QTreeView</extends>
+   <header>hierarchieexplorer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

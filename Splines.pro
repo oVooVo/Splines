@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     Objects/object.cpp \
     Objects/root.cpp \
     transformation.cpp \
-    viewport.cpp
+    viewport.cpp \
+    hierarchieexplorer.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -35,6 +36,7 @@ HEADERS  += mainwindow.h \
     Objects/object.h \
     Objects/root.h \
     transformation.h \
-    viewport.h
+    viewport.h \
+    hierarchieexplorer.h
 
 FORMS    += mainwindow.ui
