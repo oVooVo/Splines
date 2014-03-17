@@ -14,9 +14,7 @@ class Scene : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit Scene();
-private:
-    explicit Scene(Root* root);
+    explicit Scene(Root* root = new Root());
 public:
     ~Scene();
 

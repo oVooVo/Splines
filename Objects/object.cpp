@@ -24,7 +24,6 @@ Object::Object(QDataStream &stream)
 
 Object::~Object()
 {
-    qDebug() << "delete" << this << name();
 }
 
 void Object::setId(quint64 id)
@@ -70,7 +69,12 @@ Object* Object::parent() const
 
 void Object::setParent(Object *parent)
 {
+    if (Object::parent())
+        disconnect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     QObject::setParent(parent);
+    if (Object::parent()) {
+        connect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
+    }
 }
 
 void Object::addChild(Object* child, int pos)
@@ -166,12 +170,11 @@ Object* Object::deserialize(QDataStream &stream)
     QString classname;
     stream >> classname;
 
-    qDebug() << "deserialize: " << classname;
 
     if (classname == "Object") return new Object(stream);
     else if (classname == "Root") return new Root(stream);
     else if (classname == "Spline") return new Spline(stream);
-    qDebug() << "Warning: Classname " << classname << "not found.";
+    qWarning() << "Warning: Classname " << classname << "not found.";
     return 0;
 }
 
@@ -206,8 +209,6 @@ void Object::moveSelected(QPointF t)
 {
     Q_UNUSED(t);
 }
-
-
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)
 {

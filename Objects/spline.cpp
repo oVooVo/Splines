@@ -12,7 +12,15 @@ Spline::Spline(Object *parent) : Object(parent)
 
 Spline::Spline(QDataStream &stream) : Object(stream)
 {
-    Q_UNUSED(stream);
+    stream >> _points;
+    for (Point* p : _points)
+        if (p->isSelected()) _selected.append(p);
+}
+
+void Spline::serialize(QDataStream &stream) const
+{
+    Object::serialize(stream);
+    stream << _points;
 }
 
 Spline::~Spline()
@@ -68,7 +76,6 @@ void Spline::handleSelection(Point *p, bool extended)
 
 void Spline::select(QPointF globalePosition, bool extend)
 {
-    qDebug() << "Spline::select";
     QPointF pos = map(globalePosition);
     if (_points.isEmpty()) return;
     Point* pressedPoint = _points.first();
@@ -86,7 +93,6 @@ void Spline::select(QPointF globalePosition, bool extend)
 
 void Spline::moveSelected(QPointF t)
 {
-    qDebug() << "move" << t;
     QTransform trans = globaleTransform();
     trans = QTransform(trans.m11(), trans.m12(), trans.m13(), trans.m21(), trans.m22(), trans.m23(), 0, 0, trans.m33());
     t = trans.map(t);
@@ -102,6 +108,7 @@ void Spline::removeSelected()
         _points.removeOne(p);
     qDeleteAll(_selected);
     _selected.clear();
+    emit changed();
 }
 
 void Spline::insert(QPointF globalePos)

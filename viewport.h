@@ -17,8 +17,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
-
-
 private:
     Scene* _scene = 0;
     QPointF _lastMousePos;

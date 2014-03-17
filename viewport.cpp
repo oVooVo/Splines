@@ -6,7 +6,11 @@
 
 Viewport::Viewport(QWidget *parent) : QWidget(parent)
 {
-
+    /*
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this]() { update(); });
+    timer->start(33);
+    */
 }
 
 void Viewport::setScene(Scene *scene)
@@ -21,6 +25,7 @@ void Viewport::setScene(Scene *scene)
     if (_scene) {
         connect(_scene, SIGNAL(changed()), this, SLOT(update()));
     }
+
     update();
 }
 

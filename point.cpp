@@ -3,21 +3,16 @@
 
 Point::Point(QPointF point)
 {
-    qDebug() << point;
     _point = point;
-
-    qDebug() << "blubblub " << _point;
 }
 
 void Point::setPoint(QPointF p)
 {
-    qDebug() << "set point" << p;
     _point = p;
 }
 
 void Point::draw(QPainter &painter)
 {
-    qDebug() << "draw point" << point();
     painter.save();
     QPen pen;
     pen.setColor(_select ? QColor(100, 255, 0) : QColor(0, 0, 0));
@@ -35,4 +30,23 @@ void Point::draw(QPainter &painter)
         painter.drawLine(point() + rightTangent(), point());
     }
     painter.restore();
+}
+
+QDataStream& operator<<(QDataStream& out, const Point* s)
+{
+    out << s->_point << s->_left << s->_right << (quint8) s->_select << (quint8) s->_showTangents;
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, Point* &s)
+{
+    s = new Point(QPointF());
+
+    quint8 st, sel;
+
+    in >> s->_point >> s->_left >> s->_right >> sel >> st;
+    s->_select = (bool) sel;
+    s->_showTangents = (bool) st;
+
+    return in;
 }

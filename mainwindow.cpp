@@ -59,6 +59,7 @@ void MainWindow::saveAs()
 void MainWindow::load()
 {
     ui->treeView->setModel(0);
+    ui->viewport->setScene(0);
     delete _scene;
     _filepath = QFileDialog::getOpenFileName(this, "Open Project", fileDialogDirectory());
 
@@ -67,5 +68,6 @@ void MainWindow::load()
     QDataStream stream(&file);
     stream >> _scene;
     ui->treeView->setModel(_scene);
+    ui->viewport->setScene(_scene);
     file.close();
 }

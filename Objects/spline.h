@@ -22,6 +22,7 @@ public:
     void draw(QPainter &painter);
     void insert(QPointF globalePos);
     void remove(QPointF globalePos);
+    void serialize(QDataStream &stream) const;
 
 
 private:

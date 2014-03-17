@@ -29,6 +29,15 @@ private:
     QPointF _point;
     bool _showTangents = false;
     bool _select = false;
+
+protected:
+    friend QDataStream& operator<<(QDataStream& out, const Point* s);
+    friend QDataStream& operator>>(QDataStream& in, Point* &s);
+
+
 };
+
+QDataStream& operator<<(QDataStream& out, const Point* s);
+QDataStream& operator>>(QDataStream& in, Point* &s);
 
 #endif // POINT_H

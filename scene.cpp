@@ -6,15 +6,11 @@
 
 QList<QModelIndex> Scene::_draggedObjects;
 
-Scene::Scene()
-{
-    _root = new Root();
-    _selectionModel = new QItemSelectionModel(this);
-}
-
 Scene::Scene(Root *root)
 {
     _root = root;
+    connect(_root, SIGNAL(changed()), this, SIGNAL(changed()));
+    _selectionModel = new QItemSelectionModel(this);
 }
 
 Scene::~Scene()
@@ -30,9 +26,6 @@ void Scene::addObject(Object *o)
         o->setId(_objectCounter++); //yes, post decrement!
     }
     _objects.insert(o->id(), o);
-
-    connect(o, SIGNAL(changed()), this, SIGNAL(changed()));
-
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
     endInsertRows();
@@ -151,9 +144,10 @@ void Scene::insertRows(int position, const QModelIndex &parent, QList<Object*> o
 {
     Object* parentObject = getObject(parent);
 
-    for (Object* o : objects)
+    for (Object* o : objects) {
         parentObject->addChild(o, position);
-    qDebug() << parent << position << objects.size();
+        connect(o, SIGNAL(changed()), this, SIGNAL(changed()));
+    }
     beginInsertRows(parent, position, position + objects.size() - 1);
     endInsertRows();
 }
@@ -248,7 +242,6 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
 
 void Scene::insert(QPointF globPos)
 {
-    qDebug() << "Scene::insert" << globPos;
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
         getObject(index)->insert(globPos);
     }
@@ -256,7 +249,6 @@ void Scene::insert(QPointF globPos)
 
 void Scene::select(QPointF globPos, bool extended)
 {
-    qDebug() << "Scene::select" << globPos;
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
         getObject(index)->select(globPos, extended);
     }

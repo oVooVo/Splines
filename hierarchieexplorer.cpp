@@ -39,5 +39,7 @@ void HierarchieExplorer::mousePressEvent(QMouseEvent *event)
 void HierarchieExplorer::setModel(Scene *model)
 {
     QTreeView::setModel(model);
-    setSelectionModel(model->selectionModel());
+    if (model) {
+        setSelectionModel(model->selectionModel());
+    }
 }
