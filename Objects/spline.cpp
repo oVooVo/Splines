@@ -44,8 +44,11 @@ QPointF Spline::at(qreal t) const
     return piece(t);
 }
 
-void Spline::draw(QPainter &painter)
+void Spline::drawIndividual(QPainter &painter)
 {
+    QPen p;
+    p.setCosmetic(true);
+    painter.setPen(p);
     int n = 100;
     for (int i = 0; i < n; i++) {
         painter.drawLine(at(i/(n + 1.0)), at((i+1.0)/(n+1.0)));
@@ -54,7 +57,7 @@ void Spline::draw(QPainter &painter)
         p->draw(painter);
     }
 
-    Object::draw(painter);
+    Object::drawIndividual(painter);
 }
 
 void Spline::handleSelection(Point *p, bool extended)
@@ -93,9 +96,7 @@ void Spline::select(QPointF globalePosition, bool extend)
 
 void Spline::moveSelected(QPointF t)
 {
-    QTransform trans = globaleTransform();
-    trans = QTransform(trans.m11(), trans.m12(), trans.m13(), trans.m21(), trans.m22(), trans.m23(), 0, 0, trans.m33());
-    t = trans.map(t);
+    t = map(t, false);
     for (Point* p : _selected) {
         p->setPoint(p->point() + t);
     }

@@ -12,6 +12,9 @@ public:
     Attribute(QDataStream& stream) { Q_UNUSED(stream); }
     virtual void serialize(QDataStream& out) const;
     static Attribute* deserialize(QDataStream& in);
+
+signals:
+    void changed();
 };
 
 QDataStream& operator<<(QDataStream& out, const Attribute* a);

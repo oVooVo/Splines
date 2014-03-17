@@ -19,7 +19,7 @@ public:
     void select(QPointF globalePosition, bool extend = false);
     void moveSelected(QPointF t);
     void removeSelected();
-    void draw(QPainter &painter);
+    void drawIndividual(QPainter &painter);
     void insert(QPointF globalePos);
     void remove(QPointF globalePos);
     void serialize(QDataStream &stream) const;

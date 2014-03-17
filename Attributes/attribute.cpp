@@ -8,7 +8,6 @@ Attribute::Attribute()
 
 void Attribute::serialize(QDataStream &out) const
 {
-    qDebug() << "Attribute::serialize();";
     out << QString(metaObject()->className());
 }
 
@@ -26,7 +25,6 @@ Attribute* Attribute::deserialize(QDataStream &in)
 
 QDataStream& operator<<(QDataStream& out, const Attribute* a)
 {
-    qDebug() << "serialize" << a;
     a->serialize(out);
     return out;
 }

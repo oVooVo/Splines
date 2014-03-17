@@ -8,6 +8,11 @@ TransformationAttribute::TransformationAttribute()
     _sx = 1;
     _sy = 1;
     _r = 0;
+    connect(this, SIGNAL(rChanged(qreal)), this, SIGNAL(changed()));
+    connect(this, SIGNAL(xChanged(qreal)), this, SIGNAL(changed()));
+    connect(this, SIGNAL(yChanged(qreal)), this, SIGNAL(changed()));
+    connect(this, SIGNAL(sxChanged(qreal)), this, SIGNAL(changed()));
+    connect(this, SIGNAL(syChanged(qreal)), this, SIGNAL(changed()));
 }
 
 TransformationAttribute::TransformationAttribute(QDataStream &stream) : Attribute(stream)

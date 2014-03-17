@@ -18,6 +18,9 @@ Object::Object(QDataStream &stream)
     stream >> _name;
     stream >> _id;
     stream >> _attributes;
+    for (Attribute* a : _attributes) {
+        connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
+    }
 
     QList<Object*> children;
     stream >> children;
@@ -71,6 +74,18 @@ void Object::setId(quint64 id)
 void Object::draw(QPainter &painter)
 {
     painter.save();
+    painter.setTransform(localeTransform(), true);
+    painter.save();
+    drawIndividual(painter);
+    painter.restore();
+    for (Object* c : children())
+        c->draw(painter);
+    painter.restore();
+
+}
+
+void Object::drawIndividual(QPainter &painter)
+{
     QPen pen;
     pen.setCosmetic(true);
     pen.setWidth(1);
@@ -82,10 +97,6 @@ void Object::draw(QPainter &painter)
     painter.drawLine(QPointF(0, 0), QPointF(3, 0));
     pen.setColor(Qt::black);
     painter.drawEllipse(QPointF(), 1, 1);
-    painter.restore();
-
-    for (Object* c : children())
-        c->draw(painter);
 }
 
 QList<Object*> Object::children() const
@@ -195,9 +206,12 @@ QTransform Object::globaleTransform() const
     return localeTransform() * parent()->globaleTransform();
 }
 
-QPointF Object::map(QPointF localePosition) const
+QPointF Object::map(QPointF pos, bool translate) const
 {
-    return globaleTransform().map(localePosition);
+    QTransform trans = globaleTransform().inverted();
+    if (!translate)
+        trans = QTransform(trans.m11(), trans.m12(), 0, trans.m21(), trans.m22(), 0, 0, 0, 1);
+    return trans.map(pos);
 }
 
 void Object::insert(QPointF globalePos)
@@ -245,6 +259,7 @@ void Object::addAttribute(QString key, Attribute *a)
 {
     Q_ASSERT_X(!_attributes.contains(key), "Object::addAttribute", "Multiple key");
     _attributes.insert(key, a);
+    connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)

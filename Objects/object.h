@@ -24,7 +24,8 @@ public:
     //---------------
     // drawing
     //---------------
-    virtual void draw(QPainter &painter);
+    void draw(QPainter &painter);
+    virtual void drawIndividual(QPainter &painter);
 public:
     QTransform localeTransform() const {
         return ((TransformationAttribute*) attributes()[QString(TransformationAttribute::staticMetaObject.className())])->value(); }
@@ -93,7 +94,7 @@ public:
     friend QDataStream& operator<<(QDataStream& stream, const Object* o);
     friend QDataStream& operator>>(QDataStream& stream, Object* &o);
 
-    QPointF map(QPointF localePosition) const;
+    QPointF map(QPointF pos, bool translate = true) const;
 
 
     //------------------

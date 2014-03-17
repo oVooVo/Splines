@@ -32,7 +32,6 @@ void HierarchieExplorer::deleteSelected()
 
 void HierarchieExplorer::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << model()->getObject(indexAt(event->pos()))->name();
     QTreeView::mousePressEvent(event);
 }
 

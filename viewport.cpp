@@ -6,11 +6,6 @@
 
 Viewport::Viewport(QWidget *parent) : QWidget(parent)
 {
-    /*
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [this]() { update(); });
-    timer->start(33);
-    */
 }
 
 void Viewport::setScene(Scene *scene)
@@ -60,7 +55,6 @@ void Viewport::mouseMoveEvent(QMouseEvent *event)
 {
     QPointF t = event->pos() - _lastMousePos;
     if (_scene) {
-        qDebug() << "moveSelected()";
         _scene->moveSelected(t);
     }
     _lastMousePos = event->pos();

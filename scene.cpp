@@ -229,7 +229,6 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
     QDataStream stream(&encodedObject, QIODevice::ReadOnly);
     stream >> dropped;
     for (Object* o : dropped) {
-        qDebug() << row;
         insertRow(row, parent, o);
     }
     if (action == Qt::MoveAction) {
@@ -279,6 +278,7 @@ void Scene::moveSelected(QPointF globPos)
 QDataStream& operator<<(QDataStream& out, const Scene* s)
 {
     s->_root->serialize(out);
+    out << s->_freeIds << s->_objectCounter;
     return out;
 }
 
@@ -287,6 +287,7 @@ QDataStream& operator>>(QDataStream& in, Scene* &s)
     Object* root = Object::deserialize(in);
     Q_ASSERT_X(QString(root->metaObject()->className()) == "Root", "Scene operator>>", "root is not of type Root");
     s = new Scene((Root*) root);
+    in >> s->_freeIds >> s->_objectCounter;
     return in;
 }
 

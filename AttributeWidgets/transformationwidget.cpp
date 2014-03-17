@@ -67,7 +67,9 @@ void TransformationWidget::updateView()
         for (Attribute* a : _attributes) {
             if (!qFuzzyCompare(((TransformationAttribute*) a)->value(key), v)) {
                 spinbox(key)->setSpecialValueText("< multi >");
+                spinbox(key)->blockSignals(true);
                 spinbox(key)->setValue(spinbox(key)->minimum());
+                spinbox(key)->blockSignals(false);
                 break;
             }
         }

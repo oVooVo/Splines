@@ -15,7 +15,7 @@ void Root::serialize(QDataStream &stream) const
     Object::serialize(stream);
 }
 
-void Root::draw(QPainter &painter)
+void Root::drawIndividual(QPainter &painter)
 {
-    Object::draw(painter);
+    Object::drawIndividual(painter);
 }

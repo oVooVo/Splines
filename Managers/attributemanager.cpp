@@ -53,17 +53,13 @@ QList<QWidget*> AttributeManager::getWidgets(QList<Object *> objects)
         candidateClass = candidateClass->superClass();
     }
 
-    qDebug() << "tgv = " << QString(candidateClass->className());
-
 
     QList<QList<Attribute*> > attributes;
     QList<QWidget*> attributeWidgets;
 
     for (QString key : Object::attributeKeys(QString(candidateClass->className()))) {
-        qDebug() << "key: " << key;
         QList<Attribute*> attr;
         for (Object* o : objects) {
-            qDebug() << "key = " << key;
             Q_ASSERT_X(o->attributes()[key], "AttributeManager::getWidgets", "attributes is null");
             attr.append(o->attributes()[key]);
         }
