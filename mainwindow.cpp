@@ -13,11 +13,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->viewport->setScene(_scene);
     ui->treeView->setModel(_scene);
 
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, [this](){
+       QList<Object*> selection;
+       for (QModelIndex i : ui->treeView->selectionModel()->selection().indexes())
+           selection.append(ui->treeView->model()->getObject(i));
+       ui->attributeManager->setSelection(selection);
+    });
     connect(ui->actionNewSpline, &QAction::triggered, [this]() { _scene->addObject(new Spline()); });
     connect(ui->actionSpeichern, SIGNAL(triggered()), this, SLOT(save()));
     connect(ui->actionSpeichern_unter, SIGNAL(triggered()), this, SLOT(saveAs()));
     connect(ui->action_ffnen, SIGNAL(triggered()), this, SLOT(load()));
     connect(ui->insertModeSwitch, &QPushButton::clicked, [this]() { ui->viewport->insertMode = ui->insertModeSwitch->isChecked(); });
+
     ui->viewport->insertMode = ui->insertModeSwitch->isChecked();
 }
 
@@ -60,6 +67,12 @@ void MainWindow::load()
 {
     ui->treeView->setModel(0);
     ui->viewport->setScene(0);
+
+    //TODO encapsulate this to provide multiple attribute managers!
+    ui->attributeManager->disconnect();
+
+
+
     delete _scene;
     _filepath = QFileDialog::getOpenFileName(this, "Open Project", fileDialogDirectory());
 
@@ -69,5 +82,14 @@ void MainWindow::load()
     stream >> _scene;
     ui->treeView->setModel(_scene);
     ui->viewport->setScene(_scene);
+
+    //TODO encapsulate this ...each attribute manager must be connected to each tree view!
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, [this](){
+       QList<Object*> selection;
+       for (QModelIndex i : ui->treeView->selectionModel()->selection().indexes())
+           selection.append(ui->treeView->model()->getObject(i));
+       ui->attributeManager->setSelection(selection);
+    });
+
     file.close();
 }

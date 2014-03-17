@@ -5,22 +5,57 @@
 #include "root.h"
 #include "spline.h"
 #include <QPainter>
+#include <QMetaObject>
 
 Object::Object(Object *parent) : QObject(parent)
 {
     _name = genericName();
+    initAttributes();
 }
 
 Object::Object(QDataStream &stream)
 {
     stream >> _name;
     stream >> _id;
+    stream >> _attributes;
+
     QList<Object*> children;
     stream >> children;
     for (Object* o : children) {
         o->setParent(this);
     }
 }
+
+void Object::serialize(QDataStream &stream) const
+{
+    //class name
+    stream << QString(metaObject()->className());
+
+    //object attributes
+    stream << name();
+    stream << id();
+    stream << _attributes;
+
+    stream << children();
+}
+
+Object* Object::deserialize(QDataStream &stream)
+{
+    QString classname;
+    stream >> classname;
+
+    if (classname == "Object") return new Object(stream);
+    else if (classname == "Root") return new Root(stream);
+    else if (classname == "Spline") return new Spline(stream);
+    qWarning() << "Warning: Classname " << classname << "not found.";
+    return 0;
+}
+
+void Object::initAttributes()
+{
+    addAttribute("TransformationAttribute", new TransformationAttribute());
+}
+
 
 Object::~Object()
 {
@@ -154,30 +189,6 @@ bool Object::removeChildren(int position, int count)
     return true;
 }
 
-void Object::serialize(QDataStream &stream) const
-{
-    //class name
-    stream << QString(metaObject()->className());
-
-    //object attributes
-    stream << name();
-    stream << id();
-    stream << children();
-}
-
-Object* Object::deserialize(QDataStream &stream)
-{
-    QString classname;
-    stream >> classname;
-
-
-    if (classname == "Object") return new Object(stream);
-    else if (classname == "Root") return new Root(stream);
-    else if (classname == "Spline") return new Spline(stream);
-    qWarning() << "Warning: Classname " << classname << "not found.";
-    return 0;
-}
-
 QTransform Object::globaleTransform() const
 {
     if (!parent()) return localeTransform();
@@ -208,6 +219,32 @@ void Object::select(QPointF globalePos, bool extended)
 void Object::moveSelected(QPointF t)
 {
     Q_UNUSED(t);
+}
+
+QStringList Object::attributeKeys(QString classname)
+{
+
+    auto con = [](QStringList l1, QStringList l2) {
+        l1.append(l2);
+        return l1;
+    };
+
+    QStringList object, spline, root;
+    object << "TransformationAttribute";
+
+    if (classname == "Object") return object;
+    if (classname == "Spline")
+        return con(object, spline);
+    if (classname == "Root")
+        return con(object, root);
+    Q_ASSERT_X(false, "Object::attributeKeys", "undefined object");
+    return QStringList();
+}
+
+void Object::addAttribute(QString key, Attribute *a)
+{
+    Q_ASSERT_X(!_attributes.contains(key), "Object::addAttribute", "Multiple key");
+    _attributes.insert(key, a);
 }
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)

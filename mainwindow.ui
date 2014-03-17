@@ -102,7 +102,13 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4"/>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="AttributeManager" name="attributeManager" native="true"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionNewSpline">
    <property name="text">
@@ -139,7 +145,13 @@
   <customwidget>
    <class>HierarchieExplorer</class>
    <extends>QTreeView</extends>
-   <header>hierarchieexplorer.h</header>
+   <header>Managers/hierarchieexplorer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>AttributeManager</class>
+   <extends>QWidget</extends>
+   <header>Managers/attributemanager.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

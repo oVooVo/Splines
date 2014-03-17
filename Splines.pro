@@ -23,9 +23,12 @@ SOURCES += main.cpp\
     scene.cpp \
     Objects/object.cpp \
     Objects/root.cpp \
-    transformation.cpp \
     viewport.cpp \
-    hierarchieexplorer.cpp
+    Managers/hierarchieexplorer.cpp \
+    Managers/attributemanager.cpp \
+    Attributes/transformationattribute.cpp \
+    Attributes/attribute.cpp \
+    AttributeWidgets/transformationwidget.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -35,8 +38,12 @@ HEADERS  += mainwindow.h \
     scene.h \
     Objects/object.h \
     Objects/root.h \
-    transformation.h \
     viewport.h \
-    hierarchieexplorer.h
+    Managers/hierarchieexplorer.h \
+    Managers/attributemanager.h \
+    Attributes/transformationattribute.h \
+    Attributes/attribute.h \
+    AttributeWidgets/transformationwidget.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    AttributeWidgets/transformationwidget.ui

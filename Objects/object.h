@@ -2,7 +2,10 @@
 #define OBJECT_H
 
 #include <QObject>
-#include "transformation.h"
+#include <QTransform>
+#include "Attributes/attribute.h"
+#include "Attributes/transformationattribute.h"
+#include <QHash>
 
 
 class Object : public QObject
@@ -15,6 +18,7 @@ public:
     //---------------
     Object(Object* parent = 0);
     Object(QDataStream& stream);
+    virtual void initAttributes();
     virtual ~Object();
 
     //---------------
@@ -22,10 +26,10 @@ public:
     //---------------
     virtual void draw(QPainter &painter);
 public:
-    QTransform localeTransform() const { return _transformation; }
+    QTransform localeTransform() const {
+        return ((TransformationAttribute*) attributes()[QString(TransformationAttribute::staticMetaObject.className())])->value(); }
     QTransform globaleTransform() const;
-private:
-    QTransform _transformation;
+
 signals:
     void changed();
 
@@ -70,6 +74,17 @@ protected:
     QString genericName() const;
 
     //------------------
+    // AttributeSystem
+    //------------------
+protected:
+    void addAttribute(QString key, Attribute* a);
+private:
+    QHash<QString, Attribute*> _attributes;
+public:
+    QHash<QString, Attribute*> attributes() const { return _attributes; }
+    static QStringList attributeKeys(QString classname);
+
+    //------------------
     // serilization
     //------------------
 public:
@@ -89,8 +104,6 @@ public:
     virtual void remove(QPointF globalPos);
     virtual void removeSelected() {}
     virtual void moveSelected(QPointF t);
-
-
 };
 
 QDataStream& operator<<(QDataStream& stream, const Object* o);
