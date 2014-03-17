@@ -20,11 +20,19 @@ public:
     //---------------
     // drawing
     //---------------
-    void draw(QPainter &painter);
+    virtual void draw(QPainter &painter);
+public:
+    QTransform localeTransform() const { return _transformation; }
+    QTransform globaleTransform() const;
+private:
+    QTransform _transformation;
+signals:
+    void changed();
 
     //---------------
     // family stuff
     //---------------
+public:
     QList<Object *> children() const;
     Object* parent() const;
     void setParent(Object *parent);
@@ -69,6 +77,20 @@ public:
     static Object* deserialize(QDataStream& stream);
     friend QDataStream& operator<<(QDataStream& stream, const Object* o);
     friend QDataStream& operator>>(QDataStream& stream, Object* &o);
+
+    QPointF map(QPointF localePosition) const;
+
+
+    //------------------
+    // interaction
+    //------------------
+    virtual void insert(QPointF globalPos);
+    virtual void select(QPointF globalPos, bool extended);
+    virtual void remove(QPointF globalPos);
+    virtual void removeSelected() {}
+    virtual void moveSelected(QPointF t);
+
+
 };
 
 QDataStream& operator<<(QDataStream& stream, const Object* o);

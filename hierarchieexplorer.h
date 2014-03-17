@@ -11,7 +11,7 @@ class HierarchieExplorer : public QTreeView
 public:
     explicit HierarchieExplorer(QWidget *parent = 0);
     Scene* model() const { return (Scene*) QTreeView::model(); }
-    void setModel(Scene *model) { QTreeView::setModel(model); }
+    void setModel(Scene *model);
 
 protected:
     void keyPressEvent(QKeyEvent *event);

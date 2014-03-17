@@ -8,6 +8,7 @@
 #include <QQueue>
 #include <QAbstractItemModel>
 #include <QDataStream>
+#include <QItemSelectionModel>
 
 class Scene : public QAbstractItemModel
 {
@@ -37,6 +38,8 @@ private:
     //------------
 public:
     void draw(QPainter &painter);
+signals:
+    void changed();
 
     //------------
     // Tree Model
@@ -72,6 +75,25 @@ public:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 private:
     static QList<QModelIndex> _draggedObjects;
+
+    //-------------
+    // interaction
+    //-------------
+public:
+    void insert(QPointF globPos);
+    void select(QPointF globPos, bool extended);
+    void remove(QPointF globPos);
+    void removeSelected();
+    void moveSelected(QPointF t);
+
+
+    //--------------
+    // selection model
+    //--------------
+public:
+    QItemSelectionModel* selectionModel() const { return _selectionModel; }
+private:
+    QItemSelectionModel* _selectionModel = 0;
 
 
 protected:

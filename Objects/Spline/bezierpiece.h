@@ -1,7 +1,7 @@
 #ifndef BEZIERPIECE_H
 #define BEZIERPIECE_H
 
-#include <splinepiece.h>
+#include "Objects/Spline/splinepiece.h"
 
 class BezierPiece : public SplinePiece
 {

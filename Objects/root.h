@@ -10,6 +10,8 @@ public:
     Root(Root* parent = 0);
     Root(QDataStream& stream);
 
+    void draw(QPainter &painter);
+
 public:
     void serialize(QDataStream& stream) const;
 };

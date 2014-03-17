@@ -22,7 +22,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="Viewport" name="widget" native="true"/>
+     <widget class="Viewport" name="viewport" native="true"/>
     </item>
    </layout>
   </widget>
@@ -83,7 +83,20 @@
    <attribute name="dockWidgetArea">
     <number>4</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3"/>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="insertModeSwitch">
+       <property name="text">
+        <string>InsertMode</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_4">
    <attribute name="dockWidgetArea">

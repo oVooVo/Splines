@@ -9,6 +9,7 @@ QList<QModelIndex> Scene::_draggedObjects;
 Scene::Scene()
 {
     _root = new Root();
+    _selectionModel = new QItemSelectionModel(this);
 }
 
 Scene::Scene(Root *root)
@@ -30,9 +31,12 @@ void Scene::addObject(Object *o)
     }
     _objects.insert(o->id(), o);
 
+    connect(o, SIGNAL(changed()), this, SIGNAL(changed()));
+
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
     endInsertRows();
+    emit changed();
 }
 
 void Scene::removeObject(QModelIndex index)
@@ -43,6 +47,7 @@ void Scene::removeObject(QModelIndex index)
     _freeIds.enqueue(o->id());
     delete o;
     endRemoveRows();
+    emit changed();
 }
 
 void Scene::draw(QPainter &painter)
@@ -237,7 +242,45 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
         for (QModelIndex i : _draggedObjects)
             removeObject(i);
     }
+    emit changed();
     return false;
+}
+
+void Scene::insert(QPointF globPos)
+{
+    qDebug() << "Scene::insert" << globPos;
+    for (QModelIndex index : selectionModel()->selectedIndexes()) {
+        getObject(index)->insert(globPos);
+    }
+}
+
+void Scene::select(QPointF globPos, bool extended)
+{
+    qDebug() << "Scene::select" << globPos;
+    for (QModelIndex index : selectionModel()->selectedIndexes()) {
+        getObject(index)->select(globPos, extended);
+    }
+}
+
+void Scene::removeSelected()
+{
+    for (QModelIndex index : selectionModel()->selectedIndexes()) {
+        getObject(index)->removeSelected();
+    }
+}
+
+void Scene::remove(QPointF globPos)
+{
+    for (QModelIndex index : selectionModel()->selectedIndexes()) {
+        getObject(index)->remove(globPos);
+    }
+}
+
+void Scene::moveSelected(QPointF globPos)
+{
+    for (QModelIndex index : selectionModel()->selectedIndexes()) {
+        getObject(index)->moveSelected(globPos);
+    }
 }
 
 

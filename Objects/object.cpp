@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "root.h"
 #include "spline.h"
+#include <QPainter>
 
 Object::Object(Object *parent) : QObject(parent)
 {
@@ -35,7 +36,22 @@ void Object::setId(quint64 id)
 
 void Object::draw(QPainter &painter)
 {
-    Q_UNUSED(painter);
+    painter.save();
+    QPen pen;
+    pen.setCosmetic(true);
+    pen.setWidth(1);
+    pen.setColor(Qt::blue);
+    painter.setPen(pen);
+    painter.drawLine(QPointF(0, 0), QPointF(0, 3));
+    pen.setColor(Qt::red);
+    painter.setPen(pen);
+    painter.drawLine(QPointF(0, 0), QPointF(3, 0));
+    pen.setColor(Qt::black);
+    painter.drawEllipse(QPointF(), 1, 1);
+    painter.restore();
+
+    for (Object* c : children())
+        c->draw(painter);
 }
 
 QList<Object*> Object::children() const
@@ -158,6 +174,40 @@ Object* Object::deserialize(QDataStream &stream)
     qDebug() << "Warning: Classname " << classname << "not found.";
     return 0;
 }
+
+QTransform Object::globaleTransform() const
+{
+    if (!parent()) return localeTransform();
+    return localeTransform() * parent()->globaleTransform();
+}
+
+QPointF Object::map(QPointF localePosition) const
+{
+    return globaleTransform().map(localePosition);
+}
+
+void Object::insert(QPointF globalePos)
+{
+    Q_UNUSED(globalePos);
+}
+
+void Object::remove(QPointF globalePos)
+{
+    Q_UNUSED(globalePos);
+}
+
+void Object::select(QPointF globalePos, bool extended)
+{
+    Q_UNUSED(globalePos);
+    Q_UNUSED(extended);
+}
+
+void Object::moveSelected(QPointF t)
+{
+    Q_UNUSED(t);
+}
+
+
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)
 {

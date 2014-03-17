@@ -1,25 +1,24 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Viewport* viewport = new Viewport();
-
-
     _scene = new Scene();
-    viewport->setScene(_scene);
+
+    ui->viewport->setScene(_scene);
     ui->treeView->setModel(_scene);
 
     connect(ui->actionNewSpline, &QAction::triggered, [this]() { _scene->addObject(new Spline()); });
     connect(ui->actionSpeichern, SIGNAL(triggered()), this, SLOT(save()));
     connect(ui->actionSpeichern_unter, SIGNAL(triggered()), this, SLOT(saveAs()));
     connect(ui->action_ffnen, SIGNAL(triggered()), this, SLOT(load()));
-
-
+    connect(ui->insertModeSwitch, &QPushButton::clicked, [this]() { ui->viewport->insertMode = ui->insertModeSwitch->isChecked(); });
+    ui->viewport->insertMode = ui->insertModeSwitch->isChecked();
 }
 
 MainWindow::~MainWindow()

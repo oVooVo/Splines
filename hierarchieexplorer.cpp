@@ -35,3 +35,9 @@ void HierarchieExplorer::mousePressEvent(QMouseEvent *event)
     qDebug() << model()->getObject(indexAt(event->pos()))->name();
     QTreeView::mousePressEvent(event);
 }
+
+void HierarchieExplorer::setModel(Scene *model)
+{
+    QTreeView::setModel(model);
+    setSelectionModel(model->selectionModel());
+}
