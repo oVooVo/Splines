@@ -9,6 +9,8 @@ HierarchieExplorer::HierarchieExplorer(QWidget *parent) :
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     setExpandsOnDoubleClick(true);
+    setRootIsDecorated(true);
+    setHeaderHidden(true);
 
     setDefaultDropAction(Qt::MoveAction);
     setDragEnabled(true);

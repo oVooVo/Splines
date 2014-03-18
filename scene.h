@@ -29,6 +29,7 @@ private:
     Root* _root;
     quint64 _objectCounter = 0;
     QQueue<quint64> _freeIds;
+    quint64 requestId();
     QHash<quint64, Object*> _objects;
 
     //------------

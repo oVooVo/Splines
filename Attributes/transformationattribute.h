@@ -15,6 +15,7 @@ public:
     TransformationAttribute();
     TransformationAttribute(QDataStream &stream);
     void serialize(QDataStream &out) const;
+    void makeConnects();
 
     QTransform value() const;
     void setValue(QTransform t);
@@ -27,25 +28,25 @@ public:
     qreal value(Key k) const;
 
 public slots:
-    void setX(qreal x);
-    void setY(qreal y);
-    void setSX(qreal sx);
-    void setSY(qreal sy);
-    void setR(qreal r);
+    void setX(double x);
+    void setY(double y);
+    void setSX(double sx);
+    void setSY(double sy);
+    void setR(double r);
 
 signals:
-    void xChanged(qreal);
-    void yChanged(qreal);
-    void sxChanged(qreal);
-    void syChanged(qreal);
-    void rChanged(qreal);
+    void xChanged(double);
+    void yChanged(double);
+    void sxChanged(double);
+    void syChanged(double);
+    void rChanged(double);
 
 private:
-    qreal _x;
-    qreal _y;
-    qreal _sx;
-    qreal _sy;
-    qreal _r;
+    double _x;
+    double _y;
+    double _sx;
+    double _sy;
+    double _r;
     REGISTER_DECL_ATTRIBUTETYPE(TransformationAttribute);
 
 };

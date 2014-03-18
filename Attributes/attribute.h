@@ -7,17 +7,24 @@
 
 
 class Attribute;
+// convienience define to save typing the type often
 #define ATTRIBUTE_CREATOR_MAP_TYPE QMap<QString, Attribute* (*)(QDataStream&)>
+
+//creates new Object of Type T out of a given Stream.
 template<typename T> Attribute *createAttributeFromStream(QDataStream& stream) { return new T(stream); }
+
 
 class Attribute : public QObject
 {
     Q_OBJECT
 public:
     Attribute();
-    Attribute(QDataStream& stream) { Q_UNUSED(stream); }
+    Attribute(QDataStream& stream);
     virtual void serialize(QDataStream& out) const;
     static Attribute* deserialize(QDataStream& stream);
+protected:
+    virtual void makeConnects() {}
+    void polish();
 
 signals:
     void changed();

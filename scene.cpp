@@ -20,11 +20,7 @@ Scene::~Scene()
 
 void Scene::addObject(Object *o)
 {
-    if (!_freeIds.isEmpty()) {
-        o->setId(_freeIds.dequeue());
-    } else {
-        o->setId(_objectCounter++); //yes, post decrement!
-    }
+    o->setId(requestId());
     _objects.insert(o->id(), o);
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
@@ -37,7 +33,9 @@ void Scene::removeObject(QModelIndex index)
     Q_ASSERT_X(index.isValid(), "Scene::removeObject", "Trying to delete root or indexless object");
     Object* o = getObject(index);
     beginRemoveRows(index.parent(), o->row(), o->row());
-    _freeIds.enqueue(o->id());
+
+    for (quint64 id : o->idsOfAllDescendants())
+        _freeIds.enqueue(id);
     delete o;
     endRemoveRows();
     emit changed();
@@ -229,11 +227,17 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
     QDataStream stream(&encodedObject, QIODevice::ReadOnly);
     stream >> dropped;
     for (Object* o : dropped) {
+        if (action == Qt::CopyAction) {
+            o->setId(requestId());
+        }
         insertRow(row, parent, o);
     }
     if (action == Qt::MoveAction) {
         for (QModelIndex i : _draggedObjects)
             removeObject(i);
+    }
+    for (Object* o : dropped) {
+        _freeIds.removeOne(o->id());
     }
     emit changed();
     return false;
@@ -271,6 +275,15 @@ void Scene::moveSelected(QPointF globPos)
 {
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
         getObject(index)->moveSelected(globPos);
+    }
+}
+
+quint64 Scene::requestId()
+{
+    if (_freeIds.isEmpty()) {
+        return _objectCounter++;
+    } else {
+        return _freeIds.dequeue();
     }
 }
 

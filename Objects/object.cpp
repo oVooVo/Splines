@@ -71,7 +71,8 @@ Object::~Object()
 
 void Object::setId(quint64 id)
 {
-    Q_ASSERT_X(_id == 0, "Object::setId", "Trying to set ID twice");
+    Q_ASSERT_X(!_id_set_by_user, "Object::setId", "Trying to set ID twice");
+    _id_set_by_user = true;
     _id = id;
     _name = genericName();
 }
@@ -121,8 +122,9 @@ Object* Object::parent() const
 void Object::setParent(Object *parent)
 {
     QTransform gT = globaleTransform();
-    if (Object::parent())
+    if (Object::parent()) {
         disconnect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
+    }
     QObject::setParent(parent);
     if (Object::parent()) {
         connect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
@@ -216,7 +218,7 @@ QTransform Object::globaleTransform() const
 void Object::setGlobaleTransform(QTransform t)
 {
     if (!parent()) setLocaleTransform(t);
-    else setLocaleTransform(parent()->globaleTransform() * t);
+    else setLocaleTransform(t * parent()->globaleTransform().inverted() );
 }
 
 QTransform Object::localeTransform() const
@@ -287,6 +289,15 @@ void Object::addAttribute(QString key, Attribute *a)
     Q_ASSERT_X(!_attributes.contains(key), "Object::addAttribute", "Multiple key");
     _attributes.insert(key, a);
     connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
+}
+
+QList<quint64> Object::idsOfAllDescendants() const
+{
+    QList<quint64> list;
+    list << id();
+    for (Object* o : children())
+        list << o->idsOfAllDescendants();
+    return list;
 }
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)

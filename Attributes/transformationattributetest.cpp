@@ -18,13 +18,9 @@ void TransformationAttributeTest::cleanupTestCase()
 
 void TransformationAttributeTest::setValueTest()
 {
-    const int tests = 5;
+    const int tests = 1;
     qreal values[tests][5] = {
-        { 0, 0, 1, 1, 0 },
-        { 2, 2, 1, 1, 5 },
-        { 4, 2, 1, 1, M_PI },
-        { 0, 2, 2, 2, 0 },
-        { -12, 33, -1, 2, 12}
+        { 12, -100, 1, 1, 0 }
     };
 
     for (int i = 0; i < tests; i++) {
@@ -33,9 +29,14 @@ void TransformationAttributeTest::setValueTest()
         t.scale(values[i][2], values[i][3]);
         t.rotate(values[i][4]);
 
+        qDebug() << "test #" << i;
         transformationAttribute->setValue(t);
-        QTransform t_ = transformationAttribute->value();
-        QCOMPARE(t, t_);
+        QCOMPARE(transformationAttribute->x(), values[i][0]);
+        QCOMPARE(transformationAttribute->y(), values[i][1]);
+        QCOMPARE(transformationAttribute->sx(), values[i][2]);
+        QCOMPARE(transformationAttribute->sy(), values[i][3]);
+        QCOMPARE(transformationAttribute->r(), values[i][4]);
+
     }
 
 

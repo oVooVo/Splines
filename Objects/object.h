@@ -128,7 +128,9 @@ public:
     //---------------
 public:
     void setId(quint64 id);
+    bool _id_set_by_user = false;
     quint64 id() const { return _id; }
+    QList<quint64> idsOfAllDescendants() const;
 private:
     quint64 _id = 0;
 

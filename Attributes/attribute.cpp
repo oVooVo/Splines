@@ -8,6 +8,16 @@ Attribute::Attribute()
 {
 }
 
+Attribute::Attribute(QDataStream &stream)
+{
+    Q_UNUSED(stream);
+}
+
+void Attribute::polish()
+{
+    makeConnects();
+}
+
 void Attribute::serialize(QDataStream &out) const
 {
     out << QString(metaObject()->className());

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include "unittester.h"
 
 class UnitTest;
 #define UNITTEST_CREATOR_MAP_TYPE QMap<QString, UnitTest* (*)()>
