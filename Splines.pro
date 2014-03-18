@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     AttributeWidgets/transformationwidget.cpp \
     Tests/unittester.cpp \
     Attributes/transformationattributetest.cpp \
-    Tests/unittest.cpp
+    Tests/unittest.cpp \
+    AttributeWidgets/attributewidget.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     AttributeWidgets/transformationwidget.h \
     Tests/unittester.h \
     Attributes/transformationattributetest.h \
-    Tests/unittest.h
+    Tests/unittest.h \
+    AttributeWidgets/attributewidget.h
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui

@@ -10,7 +10,7 @@ class Attribute;
 // convienience define to save typing the type often
 #define ATTRIBUTE_CREATOR_MAP_TYPE QMap<QString, Attribute* (*)(QDataStream&)>
 
-//creates new Object of Type T out of a given Stream.
+//creates a new Attribute of Type T out of a given Stream.
 template<typename T> Attribute *createAttributeFromStream(QDataStream& stream) { return new T(stream); }
 
 

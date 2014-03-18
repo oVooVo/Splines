@@ -82,7 +82,7 @@ void Object::setId(quint64 id)
 void Object::draw(QPainter &painter)
 {
     painter.save();
-    painter.setTransform(localeTransform(), true);
+    painter.setTransform(localTransform(), true);
     painter.save();
     drawIndividual(painter);
     painter.restore();
@@ -124,7 +124,7 @@ Object* Object::parent() const
 void Object::setParent(Object *parent)
 {
     QTransform gT;
-    if (!_deserialize_mode) gT = globaleTransform();
+    if (!_deserialize_mode) gT = globalTransform();
 
     if (Object::parent()) {
         disconnect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
@@ -133,7 +133,7 @@ void Object::setParent(Object *parent)
     if (Object::parent()) {
         connect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     }
-    if (!_deserialize_mode) setGlobaleTransform(gT);
+    if (!_deserialize_mode) setGlobalTransform(gT);
 }
 
 void Object::addChild(Object* child, int pos)
@@ -213,25 +213,25 @@ bool Object::removeChildren(int position, int count)
     return true;
 }
 
-QTransform Object::globaleTransform() const
+QTransform Object::globalTransform() const
 {
-    if (!parent()) return localeTransform();
-    return localeTransform() * parent()->globaleTransform();
+    if (!parent()) return localTransform();
+    return localTransform() * parent()->globalTransform();
 }
 
-void Object::setGlobaleTransform(QTransform t)
+void Object::setGlobalTransform(QTransform t)
 {
-    if (!parent()) setLocaleTransform(t);
-    else setLocaleTransform(t * parent()->globaleTransform().inverted() );
+    if (!parent()) setLocalTransform(t);
+    else setLocalTransform(t * parent()->globalTransform().inverted() );
 }
 
-QTransform Object::localeTransform() const
+QTransform Object::localTransform() const
 {
     Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
     return ((TransformationAttribute*) transformationAttribute)->value();
 }
 
-void Object::setLocaleTransform(QTransform t)
+void Object::setLocalTransform(QTransform t)
 {
     Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
     return ((TransformationAttribute*) transformationAttribute)->setValue(t);
@@ -239,7 +239,7 @@ void Object::setLocaleTransform(QTransform t)
 
 QPointF Object::map(QPointF pos, bool translate) const
 {
-    QTransform trans = globaleTransform().inverted();
+    QTransform trans = globalTransform().inverted();
     if (!translate)
         trans = QTransform(trans.m11(), trans.m12(), 0, trans.m21(), trans.m22(), 0, 0, 0, 1);
     return trans.map(pos);

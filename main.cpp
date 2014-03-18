@@ -2,6 +2,9 @@
 #include <QApplication>
 #include "viewport.h"
 #include "Tests/unittester.h"
+#include <QString>
+#include <QRegExp>
+#include <QDebug>
 
 //#define TEST
 

@@ -1,27 +1,30 @@
 #ifndef TRANSFORMATIONWIDGET_H
 #define TRANSFORMATIONWIDGET_H
 
+#include "attributewidget.h"
 #include <QWidget>
-#include "../Attributes/transformationattribute.h"
-#include "../Attributes/attribute.h"
+#include "Attributes/transformationattribute.h"
+#include "Attributes/attribute.h"
 
 namespace Ui {
 class TransformationWidget;
 }
 
-class TransformationWidget : public QWidget
+class TransformationWidget : public AttributeWidget
 {
     Q_OBJECT
 
 public:
-    explicit TransformationWidget(QList<Attribute *> attributes, QWidget *parent = 0);
+    explicit TransformationWidget(QList<Attribute *> attributes);
     ~TransformationWidget();
+    QWidget* createWidget(QWidget *parent) const;
 
-private:
-    Ui::TransformationWidget *ui;
-    QList<Attribute*> _attributes;
 private slots:
     void updateView();
+
+private:
+    REGISTER_DECL_ATTRIBUTEWIDGETTYPE(TransformationWidget);
+
 };
 
 #endif // TRANSFORMATIONWIDGET_H

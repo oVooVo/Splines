@@ -1,5 +1,5 @@
 #include "attributemanager.h"
-#include "AttributeWidgets/transformationwidget.h"
+#include "AttributeWidgets/attributewidget.h"
 #include <QDebug>
 
 AttributeManager::AttributeManager(QWidget *parent) :
@@ -39,38 +39,34 @@ QList<QWidget*> AttributeManager::getWidgets(QList<Object *> objects)
     if (objects.isEmpty()) {
         return QList<QWidget*>();
     }
-    auto checkInheritance = [objects](const char* classname) {
-        for (Object* o : objects) {
-            if (!o->inherits(classname))
-                return false;
+
+
+    // find set keys that includes each QString k, that is an attribute's key in each object in objects
+    QList<QString> keys = objects.first()->attributes().keys();
+    for (Object* o : objects) {
+        for (QString key : keys) {
+            if (!o->attributes().keys().contains(key)) {
+                keys.removeOne(key);
+            }
         }
-        return true;
-    };
-
-    const QMetaObject* candidateClass = objects.first()->metaObject();
-
-    while (!checkInheritance(candidateClass->className())) {
-        candidateClass = candidateClass->superClass();
     }
 
+    //for each key in keys find corresponding attributes for each object in objects
+    QList<QList<Attribute*> > attributeLists;
+    for (QString key : keys) {
+        QList<Attribute*> attributes_with_equal_key;
+        for (Object* o : objects) {
+            attributes_with_equal_key.append(o->attributes()[key]);
+        }
+        attributeLists.append(attributes_with_equal_key);
+    }
 
-    QList<QList<Attribute*> > attributes;
+    //now find attributeWidgets for each attribute-list!
     QList<QWidget*> attributeWidgets;
-
-    for (QString key : Object::attributeKeys(QString(candidateClass->className()))) {
-        QList<Attribute*> attr;
-        for (Object* o : objects) {
-            Q_ASSERT_X(o->attributes()[key], "AttributeManager::getWidgets", "attributes is null");
-            attr.append(o->attributes()[key]);
-        }
-        attributes.append(attr);
+    for (QList<Attribute*> attributes : attributeLists) {
+        attributeWidgets.append(AttributeWidget::createWidget(attributes));
     }
 
-    for (QList<Attribute*> attr : attributes) {
-        QString classname = QString(attr.first()->metaObject()->className());
-        if (classname == TransformationAttribute::staticMetaObject.className()) {
-            attributeWidgets.append(new TransformationWidget(attr));
-        }
-    }
+
     return attributeWidgets;
 }

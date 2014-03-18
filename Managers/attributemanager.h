@@ -5,6 +5,7 @@
 #include <Objects/object.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include "AttributeWidgets/attributewidget.h"
 
 class AttributeManager : public QWidget
 {
