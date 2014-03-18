@@ -7,6 +7,9 @@
 #include <QPainter>
 #include <QMetaObject>
 
+
+OBJECT_CREATOR_MAP_TYPE *Object::_creatorMap = 0;
+
 Object::Object(Object *parent) : QObject(parent)
 {
     _name = genericName();
@@ -47,11 +50,12 @@ Object* Object::deserialize(QDataStream &stream)
     QString classname;
     stream >> classname;
 
-    if (classname == "Object") return new Object(stream);
-    else if (classname == "Root") return new Root(stream);
-    else if (classname == "Spline") return new Spline(stream);
-    qWarning() << "Warning: Classname " << classname << "not found.";
-    return 0;
+    Object* object = createInstance(classname, stream);
+    if (!object) {
+        qWarning() << "Warning: Classname " << classname << "not found.";
+        Q_ASSERT_X(object, "Object::deserialize", "deserialization failed.");
+    }
+    return object;
 }
 
 void Object::initAttributes()
@@ -62,6 +66,7 @@ void Object::initAttributes()
 
 Object::~Object()
 {
+    qDeleteAll(_attributes);
 }
 
 void Object::setId(quint64 id)
@@ -91,10 +96,10 @@ void Object::drawIndividual(QPainter &painter)
     pen.setWidth(1);
     pen.setColor(Qt::blue);
     painter.setPen(pen);
-    painter.drawLine(QPointF(0, 0), QPointF(0, 3));
+    painter.drawLine(QPointF(0, 0), QPointF(0, 20));
     pen.setColor(Qt::red);
     painter.setPen(pen);
-    painter.drawLine(QPointF(0, 0), QPointF(3, 0));
+    painter.drawLine(QPointF(0, 0), QPointF(20, 0));
     pen.setColor(Qt::black);
     painter.drawEllipse(QPointF(), 1, 1);
 }
@@ -115,18 +120,20 @@ Object* Object::parent() const
 
 void Object::setParent(Object *parent)
 {
+    QTransform gT = globaleTransform();
     if (Object::parent())
         disconnect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     QObject::setParent(parent);
     if (Object::parent()) {
         connect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     }
+    setGlobaleTransform(gT);
 }
 
 void Object::addChild(Object* child, int pos)
 {
     if (!child) return;
-    if (pos == -1) {
+    if (pos < 0) {
         child->setParent(this);
     } else {
         QList<Object*> childs;
@@ -206,6 +213,24 @@ QTransform Object::globaleTransform() const
     return localeTransform() * parent()->globaleTransform();
 }
 
+void Object::setGlobaleTransform(QTransform t)
+{
+    if (!parent()) setLocaleTransform(t);
+    else setLocaleTransform(parent()->globaleTransform() * t);
+}
+
+QTransform Object::localeTransform() const
+{
+    Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
+    return ((TransformationAttribute*) transformationAttribute)->value();
+}
+
+void Object::setLocaleTransform(QTransform t)
+{
+    Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
+    return ((TransformationAttribute*) transformationAttribute)->setValue(t);
+}
+
 QPointF Object::map(QPointF pos, bool translate) const
 {
     QTransform trans = globaleTransform().inverted();
@@ -243,6 +268,8 @@ QStringList Object::attributeKeys(QString classname)
         return l1;
     };
 
+    //TODO
+
     QStringList object, spline, root;
     object << "TransformationAttribute";
 
@@ -272,6 +299,19 @@ QDataStream& operator>>(QDataStream& stream, Object* &o)
 {
     o = Object::deserialize(stream);
     return stream;
+}
+
+Object *Object::createInstance(QString className, QDataStream& stream)
+{
+    if (!_creatorMap)
+    {
+        _creatorMap = new OBJECT_CREATOR_MAP_TYPE();
+    }
+
+    OBJECT_CREATOR_MAP_TYPE::iterator it = _creatorMap->find(className);
+    if (it == _creatorMap->end())
+        return 0;
+    return (it.value())(stream);
 }
 
 

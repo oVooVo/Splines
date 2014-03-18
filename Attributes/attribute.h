@@ -3,6 +3,12 @@
 
 #include <QObject>
 #include <QDataStream>
+#include <QMap>
+
+
+class Attribute;
+#define ATTRIBUTE_CREATOR_MAP_TYPE QMap<QString, Attribute* (*)(QDataStream&)>
+template<typename T> Attribute *createAttributeFromStream(QDataStream& stream) { return new T(stream); }
 
 class Attribute : public QObject
 {
@@ -11,11 +17,32 @@ public:
     Attribute();
     Attribute(QDataStream& stream) { Q_UNUSED(stream); }
     virtual void serialize(QDataStream& out) const;
-    static Attribute* deserialize(QDataStream& in);
+    static Attribute* deserialize(QDataStream& stream);
 
 signals:
     void changed();
+
+protected:
+    static ATTRIBUTE_CREATOR_MAP_TYPE *_creatorMap;
+    static Attribute *createInstance(QString className, QDataStream &stream);
 };
+
+template<typename T>
+struct AttributeRegister : Attribute
+{
+    AttributeRegister(QString className) : Attribute()
+    {
+        if (!_creatorMap)
+            _creatorMap = new ATTRIBUTE_CREATOR_MAP_TYPE();
+        _creatorMap->insert(className, &createAttributeFromStream<T>);
+    }
+};
+
+#define REGISTER_DECL_ATTRIBUTETYPE(CLASSNAME) \
+    static AttributeRegister<CLASSNAME> reg
+
+#define REGISTER_DEFN_ATTRIBUTETYPE(CLASSNAME) \
+    AttributeRegister<CLASSNAME> CLASSNAME::reg(#CLASSNAME)
 
 QDataStream& operator<<(QDataStream& out, const Attribute* a);
 QDataStream& operator>>(QDataStream& in,  Attribute* &a);

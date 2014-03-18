@@ -17,8 +17,9 @@ public:
     void serialize(QDataStream &out) const;
 
     QTransform value() const;
+    void setValue(QTransform t);
 
-    qreal r() const { return _r; }
+    qreal r() const { return _r * 180 * M_1_PI; }
     qreal x() const { return _x; }
     qreal y() const { return _y; }
     qreal sx() const { return _sx; }
@@ -45,6 +46,7 @@ private:
     qreal _sx;
     qreal _sy;
     qreal _r;
+    REGISTER_DECL_ATTRIBUTETYPE(TransformationAttribute);
 
 };
 

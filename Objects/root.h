@@ -14,6 +14,9 @@ public:
 
 public:
     void serialize(QDataStream& stream) const;
+
+private:
+    REGISTER_DECL_OBJECTTYPE(Root);
 };
 
 #endif // ROOT_H

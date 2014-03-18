@@ -33,6 +33,7 @@ private:
     void select(Point* p)   { p->select();   _selected.append(p);    }
     void deselect(Point* p) { p->deselect(); _selected.removeAll(p); }
     void deselectAll() { for (Point* p : _selected) deselect(p); }
+    REGISTER_DECL_OBJECTTYPE(Spline);
 };
 
 #endif // SPLINE_H

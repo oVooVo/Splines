@@ -28,21 +28,24 @@ void Viewport::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.fillRect(rect(), Qt::white);
+    _globaleTransformation = QTransform::fromTranslate(width()/2, height()/2);
+    painter.setTransform(_globaleTransformation);
     if (_scene)
         _scene->draw(painter);
 }
 
 void Viewport::mousePressEvent(QMouseEvent *event)
 {
-    _lastMousePos = event->pos();
+    QPointF pos = map(event->pos());
+    _lastMousePos = pos;
     if (_scene) {
         switch (event->button()) {
         case Qt::LeftButton :
-            if (insertMode) _scene->insert(event->pos());
-            else _scene->select(event->pos(), event->modifiers() == Qt::CTRL);
+            if (insertMode) _scene->insert(pos);
+            else _scene->select(pos, event->modifiers() == Qt::CTRL);
             break;
         case Qt::RightButton:
-            _scene->remove(event->pos());
+            _scene->remove(pos);
             break;
         case Qt::MiddleButton:
         default:
@@ -53,10 +56,16 @@ void Viewport::mousePressEvent(QMouseEvent *event)
 
 void Viewport::mouseMoveEvent(QMouseEvent *event)
 {
-    QPointF t = event->pos() - _lastMousePos;
+    QPointF pos = map(event->pos());
+    QPointF t = pos - _lastMousePos;
+
     if (_scene) {
         _scene->moveSelected(t);
     }
-    _lastMousePos = event->pos();
+    _lastMousePos = map(event->pos());
 }
 
+QPointF Viewport::map(QPointF p) const
+{
+    return _globaleTransformation.inverted().map(p);
+}

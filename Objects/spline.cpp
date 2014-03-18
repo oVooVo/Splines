@@ -6,6 +6,8 @@
 
 const qreal Spline::EPS = 4.0;
 
+REGISTER_DEFN_OBJECTTYPE(Spline);
+
 Spline::Spline(Object *parent) : Object(parent)
 {
 }

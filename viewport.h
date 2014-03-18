@@ -20,6 +20,8 @@ protected:
 private:
     Scene* _scene = 0;
     QPointF _lastMousePos;
+    QTransform _globaleTransformation;
+    QPointF map(QPointF p) const;
 };
 
 #endif // VIEWPORT_H

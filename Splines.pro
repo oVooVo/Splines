@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,7 +12,6 @@ TARGET = Splines
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++0x
-
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -28,7 +27,10 @@ SOURCES += main.cpp\
     Managers/attributemanager.cpp \
     Attributes/transformationattribute.cpp \
     Attributes/attribute.cpp \
-    AttributeWidgets/transformationwidget.cpp
+    AttributeWidgets/transformationwidget.cpp \
+    Tests/unittester.cpp \
+    Attributes/transformationattributetest.cpp \
+    Tests/unittest.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -43,7 +45,10 @@ HEADERS  += mainwindow.h \
     Managers/attributemanager.h \
     Attributes/transformationattribute.h \
     Attributes/attribute.h \
-    AttributeWidgets/transformationwidget.h
+    AttributeWidgets/transformationwidget.h \
+    Tests/unittester.h \
+    Attributes/transformationattributetest.h \
+    Tests/unittest.h
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui

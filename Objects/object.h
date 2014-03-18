@@ -6,7 +6,12 @@
 #include "Attributes/attribute.h"
 #include "Attributes/transformationattribute.h"
 #include <QHash>
+#include <QMap>
 
+
+class Object;
+#define OBJECT_CREATOR_MAP_TYPE QMap<QString, Object* (*)(QDataStream&)>
+template<typename T> Object *createObjectFromStream(QDataStream& stream) { return new T(stream); }
 
 class Object : public QObject
 {
@@ -16,32 +21,93 @@ public:
     //---------------
     // ctor, dtor
     //---------------
+    /**
+     * @brief Object creates new Object with given parent.
+     * @param parent the parent of the new object.
+     */
     Object(Object* parent = 0);
+
+    /**
+     * @brief Object creates new Object out of a QDataStream. Use this constructor only in context of serialization
+     * @param stream the object is created from data of this stream
+     */
     Object(QDataStream& stream);
-    virtual void initAttributes();
+
+    /**
+     * @brief ~Object destructs this object, all children and all attributes.
+     */
     virtual ~Object();
+
+    /**
+     * @brief initAttributes initialize Attributes. This Method defines which attributes this Object has.
+     */
+    virtual void initAttributes();
+
+
 
     //---------------
     // drawing
     //---------------
-    void draw(QPainter &painter);
-    virtual void drawIndividual(QPainter &painter);
 public:
-    QTransform localeTransform() const {
-        return ((TransformationAttribute*) attributes()[QString(TransformationAttribute::staticMetaObject.className())])->value(); }
-    QTransform globaleTransform() const;
+    /**
+     * @brief draws this Object and all its children
+     * @param painter paints this objects
+     */
+    void draw(QPainter &painter);
 
-signals:
-    void changed();
+public:
+    /**
+     * @brief localeTransform convienience functions to access locale transformation
+     * @return locale Transformation (relative to this objects parent).
+     */
+    QTransform localeTransform() const;
+    void setLocaleTransform(QTransform t);
+
+    /**
+     * @brief globaleTransform returns the globale transformation relative to the root
+     * @return globaleTransform returns the globale transformation relative to the root
+     */
+    QTransform globaleTransform() const;
+    void setGlobaleTransform(QTransform t);
+
+protected:
+    /**
+     * @brief drawIndividual does the object specific painting
+     * @param painter paints the object
+     */
+    virtual void drawIndividual(QPainter &painter);
+
 
     //---------------
     // family stuff
     //---------------
 public:
+    /**
+     * @brief children returns Object* list instead of QObject list since all children of Object are Objects*.
+     * @return Object* list instead of QObject list since all children of Object are Objects*.
+     * @overload QObject::children() const
+     */
     QList<Object *> children() const;
+
+    /**
+     * @brief parent returns the parent of this object as Object*
+     * @return parent of this object as Object*
+     * @overload QObject::parent() const
+     */
     Object* parent() const;
+
+    /**
+     * @brief setParent sets the parent of this Object. Ensures that parent of this object is always Object*
+     * @param parent sets the parent of this Object.
+     */
     void setParent(Object *parent);
-    void addChild(Object* child, int pos);
+
+    /**
+     * @brief addChild adds a child to this Object. This Object becomes automatically a parent of child.
+     * @param child the new child of this Object.
+     * @param pos the position where child is inserted. If pos < 0, this does exactly the same as calling setParent on child.
+     */
+    void addChild(Object* child, int pos = -1);
 
     //---------------
     // Tree item
@@ -105,7 +171,35 @@ public:
     virtual void remove(QPointF globalPos);
     virtual void removeSelected() {}
     virtual void moveSelected(QPointF t);
+
+
+signals:
+    void changed();
+
+protected:
+    static OBJECT_CREATOR_MAP_TYPE *_creatorMap;
+    static Object *createInstance(QString className, QDataStream &stream);
+
+
+
 };
+
+template<typename T>
+struct ObjectRegister : Object
+{
+    ObjectRegister(QString className) : Object()
+    {
+        if (!_creatorMap)
+            _creatorMap = new OBJECT_CREATOR_MAP_TYPE();
+        _creatorMap->insert(className, &createObjectFromStream<T>);
+    }
+};
+
+#define REGISTER_DECL_OBJECTTYPE(CLASSNAME) \
+    static ObjectRegister<CLASSNAME> reg
+
+#define REGISTER_DEFN_OBJECTTYPE(CLASSNAME) \
+    ObjectRegister<CLASSNAME> CLASSNAME::reg(#CLASSNAME)
 
 QDataStream& operator<<(QDataStream& stream, const Object* o);
 QDataStream& operator>>(QDataStream& stream, Object* &o);
