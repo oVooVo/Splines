@@ -32,7 +32,11 @@ public:
      * @param stream the object is created from data of this stream
      */
     Object(QDataStream& stream);
+private:
+    bool _deserialize_mode = false;
 
+
+public:
     /**
      * @brief ~Object destructs this object, all children and all attributes.
      */

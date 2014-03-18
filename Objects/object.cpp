@@ -28,7 +28,9 @@ Object::Object(QDataStream &stream)
     QList<Object*> children;
     stream >> children;
     for (Object* o : children) {
+        o->_deserialize_mode = true;
         o->setParent(this);
+        o->_deserialize_mode = false;
     }
 }
 
@@ -121,7 +123,9 @@ Object* Object::parent() const
 
 void Object::setParent(Object *parent)
 {
-    QTransform gT = globaleTransform();
+    QTransform gT;
+    if (!_deserialize_mode) gT = globaleTransform();
+
     if (Object::parent()) {
         disconnect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     }
@@ -129,7 +133,7 @@ void Object::setParent(Object *parent)
     if (Object::parent()) {
         connect(this, SIGNAL(changed()), parent, SIGNAL(changed()));
     }
-    setGlobaleTransform(gT);
+    if (!_deserialize_mode) setGlobaleTransform(gT);
 }
 
 void Object::addChild(Object* child, int pos)
