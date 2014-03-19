@@ -44,3 +44,9 @@ void HierarchieExplorer::setModel(Scene *model)
         setSelectionModel(model->selectionModel());
     }
 }
+
+void HierarchieExplorer::update()
+{
+    dataChanged(QModelIndex(), QModelIndex());
+    QTreeView::update();
+}

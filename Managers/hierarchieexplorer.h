@@ -13,6 +13,9 @@ public:
     Scene* model() const { return (Scene*) QTreeView::model(); }
     void setModel(Scene *model);
 
+public slots:
+    void update();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);

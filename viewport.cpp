@@ -69,3 +69,10 @@ QPointF Viewport::map(QPointF p) const
 {
     return _globaleTransformation.inverted().map(p);
 }
+
+
+
+
+
+
+

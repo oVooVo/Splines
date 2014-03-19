@@ -6,19 +6,18 @@
 #include "spline.h"
 #include <QPainter>
 #include <QMetaObject>
+#include "Attributes/stringattribute.h"
 
 
 OBJECT_CREATOR_MAP_TYPE *Object::_creatorMap = 0;
 
 Object::Object(Object *parent) : QObject(parent)
 {
-    _name = genericName();
     initAttributes();
 }
 
 Object::Object(QDataStream &stream)
 {
-    stream >> _name;
     stream >> _id;
     stream >> _attributes;
     for (Attribute* a : _attributes) {
@@ -40,7 +39,6 @@ void Object::serialize(QDataStream &stream) const
     stream << QString(metaObject()->className());
 
     //object attributes
-    stream << name();
     stream << id();
     stream << _attributes;
 
@@ -63,6 +61,7 @@ Object* Object::deserialize(QDataStream &stream)
 void Object::initAttributes()
 {
     addAttribute("TransformationAttribute", new TransformationAttribute());
+    addAttribute("NameAttribute", new StringAttribute("Name:", genericName()));
 }
 
 
@@ -76,7 +75,7 @@ void Object::setId(quint64 id)
     Q_ASSERT_X(!_id_set_by_user, "Object::setId", "Trying to set ID twice");
     _id_set_by_user = true;
     _id = id;
-    _name = genericName();
+    setName(genericName());
 }
 
 void Object::draw(QPainter &painter)
@@ -186,7 +185,7 @@ int Object::columnCount() const
 QVariant Object::data(int column) const
 {
     switch (column) {
-    case 0:     return _name;
+    case 0:     return name();
     default:    return QString("###");
     }
 
@@ -227,14 +226,26 @@ void Object::setGlobalTransform(QTransform t)
 
 QTransform Object::localTransform() const
 {
-    Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
-    return ((TransformationAttribute*) transformationAttribute)->value();
+    Attribute* attribute = attributes()["TransformationAttribute"];
+    return ((TransformationAttribute*) attribute)->value();
 }
 
 void Object::setLocalTransform(QTransform t)
 {
-    Attribute* transformationAttribute = attributes()[QString(TransformationAttribute::staticMetaObject.className())];
-    return ((TransformationAttribute*) transformationAttribute)->setValue(t);
+    Attribute* attribute = attributes()["TransformationAttribute"];
+    return ((TransformationAttribute*) attribute)->setValue(t);
+}
+
+QString Object::name() const
+{
+    Attribute* attribute = attributes()["NameAttribute"];
+    return ((StringAttribute*) attribute)->string();
+}
+
+void Object::setName(QString name)
+{
+    Attribute* attribute = attributes()["NameAttribute"];
+    ((StringAttribute*) attribute)->setString(name);
 }
 
 QPointF Object::map(QPointF pos, bool translate) const

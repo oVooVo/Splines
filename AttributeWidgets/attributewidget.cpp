@@ -7,10 +7,17 @@ ATTRIBUTEWIDGET_CREATOR_MAP_TYPE *AttributeWidget::_creatorMap = 0;
 AttributeWidget::AttributeWidget(QList<Attribute *> attributes)
 {
     _attributes = attributes;
-}
+//    for (Attribute* a : _attributes) {
 
-AttributeWidget::AttributeWidget()
-{
+//        // Note: old SIGNAL-SLOT syntax does not work. Apperently at this time, this is a QWidget, not an AttributeWidget so
+//        //  QMetablabla cannot determine the correct SLOT. However, when the SIGNAL is raised, this is an AttributeWidget so
+//        //  the call is safe.
+//        connect(a, &Attribute::changed, [this]() {
+//            qDebug() << "blublub";
+//            qDebug() << "call update View" << metaObject()->className();
+//            updateView();
+//        });
+//    }
 }
 
 QWidget* AttributeWidget::createWidget(QList<Attribute *> attributes)
@@ -40,13 +47,13 @@ QWidget* AttributeWidget::createWidget(QList<Attribute *> attributes)
     QWidget* widget = 0;
     ATTRIBUTEWIDGET_CREATOR_MAP_TYPE::Iterator it = _creatorMap->find(classname);
     if (it != _creatorMap->end()) {
-        AttributeWidget* attributeWidget = (it.value())(attributes);
-        widget = attributeWidget->createWidget();
+        widget = (it.value())(attributes);
     }
 
     if (!widget) {
         qWarning() << "Warning: Classname " << classname << "not found.";
         Q_ASSERT_X(widget, "Object::deserialize", "deserialization failed.");
     }
+
     return widget;
 }

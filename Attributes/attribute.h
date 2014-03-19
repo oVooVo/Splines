@@ -20,9 +20,9 @@ class Attribute : public QObject
 public:
     Attribute();
     Attribute(QDataStream& stream);
+protected:
     virtual void serialize(QDataStream& out) const;
     static Attribute* deserialize(QDataStream& stream);
-protected:
     virtual void makeConnects() {}
     void polish();
 
@@ -32,6 +32,9 @@ signals:
 protected:
     static ATTRIBUTE_CREATOR_MAP_TYPE *_creatorMap;
     static Attribute *createInstance(QString className, QDataStream &stream);
+
+    friend QDataStream& operator<<(QDataStream& out, const Attribute* a);
+    friend QDataStream& operator>>(QDataStream& in,  Attribute* &a);
 };
 
 template<typename T>

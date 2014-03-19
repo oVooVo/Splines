@@ -2,13 +2,7 @@
 #define TRANSFORMATIONWIDGET_H
 
 #include "attributewidget.h"
-#include <QWidget>
-#include "Attributes/transformationattribute.h"
-#include "Attributes/attribute.h"
-
-namespace Ui {
-class TransformationWidget;
-}
+#include "ui_transformationwidget.h"
 
 class TransformationWidget : public AttributeWidget
 {
@@ -16,14 +10,16 @@ class TransformationWidget : public AttributeWidget
 
 public:
     explicit TransformationWidget(QList<Attribute *> attributes);
-    ~TransformationWidget();
-    QWidget* createWidget(QWidget *parent) const;
 
+    QWidget* createWidget(QWidget *parent) const;
 private slots:
     void updateView();
+private:
+    Ui::TransformationWidget* ui;
 
 private:
     REGISTER_DECL_ATTRIBUTEWIDGETTYPE(TransformationWidget);
+
 
 };
 

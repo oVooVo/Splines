@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSpeichern_unter, SIGNAL(triggered()), this, SLOT(saveAs()));
     connect(ui->action_ffnen, SIGNAL(triggered()), this, SLOT(load()));
     connect(ui->insertModeSwitch, &QPushButton::clicked, [this]() { ui->viewport->insertMode = ui->insertModeSwitch->isChecked(); });
+    connect(_scene, SIGNAL(changed()), ui->treeView, SLOT(update()));
 
     ui->viewport->insertMode = ui->insertModeSwitch->isChecked();
 }
@@ -90,6 +91,7 @@ void MainWindow::load()
            selection.append(ui->treeView->model()->getObject(i));
        ui->attributeManager->setSelection(selection);
     });
+    //connect(_scene, SIGNAL(changed()), ui->treeView, SLOT(update()));
 
     file.close();
 }

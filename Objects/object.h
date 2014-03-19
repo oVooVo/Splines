@@ -216,10 +216,8 @@ private:
 
     //TODO make attribute out of this!
 public:
-    QString name() const { return _name; }
-    void setName(QString name) { _name = name; }
-private:
-    QString _name = "";
+    QString name() const;
+    void setName(QString name);
 protected:
     QString genericName() const;
 

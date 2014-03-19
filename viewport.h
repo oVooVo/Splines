@@ -12,6 +12,7 @@ public:
     Scene* scene() const { return _scene; }
     bool insertMode;
 
+
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
