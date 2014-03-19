@@ -44,10 +44,10 @@ void TransformationWidget::updateView()
     for (int i = TransformationAttribute::Key_first; i <= TransformationAttribute::Key_last; i++) {
         TransformationAttribute::Key key = (TransformationAttribute::Key) i;
         spinbox(key)->blockSignals(true);
-        double v = ((TransformationAttribute*) attributes().first())->value(key);
+        double v = (attributes<TransformationAttribute>().first())->value(key);
         spinbox(key)->setValue(v);
-        for (Attribute* a : attributes()) {
-            if (!qFuzzyCompare(((TransformationAttribute*) a)->value(key), v)) {
+        for (TransformationAttribute* a : attributes<TransformationAttribute>()) {
+            if (!qFuzzyCompare(a->value(key), v)) {
                 spinbox(key)->setSpecialValueText(MULTI_LABEL);
                 spinbox(key)->setValue(spinbox(key)->minimum());
                 break;

@@ -250,27 +250,6 @@ QPointF Object::map(QPointF pos, bool translate) const
     return trans.map(pos);
 }
 
-void Object::insert(QPointF globalePos)
-{
-    Q_UNUSED(globalePos);
-}
-
-void Object::remove(QPointF globalePos)
-{
-    Q_UNUSED(globalePos);
-}
-
-void Object::select(QPointF globalePos, bool extended)
-{
-    Q_UNUSED(globalePos);
-    Q_UNUSED(extended);
-}
-
-void Object::moveSelected(QPointF t)
-{
-    Q_UNUSED(t);
-}
-
 QStringList Object::attributeKeys(QString classname)
 {
 
@@ -333,5 +312,3 @@ Object *Object::createInstance(QString className, QDataStream& stream)
         return 0;
     return (it.value())(stream);
 }
-
-

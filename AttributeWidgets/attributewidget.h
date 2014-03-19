@@ -31,7 +31,14 @@ public:
      * @brief attributes returns the attributes this widget is connected to
      * @return the attributes this widget is connected to
      */
-    QList<Attribute*> attributes() const { return _attributes; }
+    template<typename T = Attribute> QList<T*> attributes() const
+    {
+        QList<T*> list;
+        for (Attribute* a : _attributes) {
+            list << a->cast<T>();
+        }
+        return list;
+    }
 
 private:
     /**

@@ -9,14 +9,13 @@ TypeWidget::TypeWidget(QList<Attribute *> attributes) :
 {
     ui->setupUi(this);
 
-    ui->label->setText(((TypeAttribute*) attributes.first())->label());
+    ui->label->setText(this->attributes<TypeAttribute>().first()->label());
 
-    ui->comboBox->addItems(((TypeAttribute*) attributes.first())->types());
+    ui->comboBox->addItems(this->attributes<TypeAttribute>().first()->types());
 
-    for (Attribute* a : attributes) {
-        TypeAttribute* ta = (TypeAttribute*) a;
-        connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), ta, SLOT(setCurrentIndex(int)));
-        connect(ta, SIGNAL(changed()), this, SLOT(updateView()));
+    for (TypeAttribute* a : this->attributes<TypeAttribute>()) {
+        connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), a, SLOT(setCurrentIndex(int)));
+        connect(a, SIGNAL(changed()), this, SLOT(updateView()));
     }
     updateView();
 }

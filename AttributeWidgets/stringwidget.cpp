@@ -14,10 +14,9 @@ StringWidget::StringWidget(QList<Attribute*> attributes) : AttributeWidget(attri
     ui->label->setText(((StringAttribute*) attributes.first())->label());
 
 
-    for (Attribute* a : attributes) {
-        StringAttribute* sa = (StringAttribute*) a;
-        connect(ui->lineEdit, SIGNAL(textChanged(QString)), sa, SLOT(setString(QString)));
-        connect(sa, SIGNAL(changed()), this, SLOT(updateView()));
+    for (StringAttribute* a : this->attributes<StringAttribute>()) {
+        connect(ui->lineEdit, SIGNAL(textChanged(QString)), a, SLOT(setString(QString)));
+        connect(a, SIGNAL(changed()), this, SLOT(updateView()));
     }
     updateView();
 }
@@ -25,10 +24,9 @@ StringWidget::StringWidget(QList<Attribute*> attributes) : AttributeWidget(attri
 void StringWidget::updateView()
 {
     ui->lineEdit->blockSignals(true);
-    ui->lineEdit->setText(((StringAttribute*) attributes().first())->string());
-    for (Attribute* a : attributes()) {
-        StringAttribute* sa = (StringAttribute*) a;
-        if (ui->lineEdit->text() != sa->string()) {
+    ui->lineEdit->setText(attributes<StringAttribute>().first()->string());
+    for (StringAttribute* a : attributes<StringAttribute>()) {
+        if (ui->lineEdit->text() != a->string()) {
             ui->lineEdit->setText(MULTI_LABEL);
             break;
         }

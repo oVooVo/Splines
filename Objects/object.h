@@ -7,6 +7,7 @@
 #include "Attributes/transformationattribute.h"
 #include <QHash>
 #include <QMap>
+#include "interaction.h"
 
 
 class Object;
@@ -266,16 +267,18 @@ private:
      */
     bool _deserialize_mode = false;
 
-
+/*
     //------------------
     // interaction
     //------------------
 public:
+    virtual void processInteraction(Interaction&) {}
     virtual void insert(QPointF globalPos);
     virtual void select(QPointF globalPos, bool extended);
     virtual void remove(QPointF globalPos);
     virtual void removeSelected() {}
     virtual void moveSelected(QPointF t);
+    */
 
 
 signals:

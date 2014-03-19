@@ -9,6 +9,8 @@
 #include <QAbstractItemModel>
 #include <QDataStream>
 #include <QItemSelectionModel>
+#include "interaction.h"
+#include "Tools/tool.h"
 
 class Scene : public QAbstractItemModel
 {
@@ -79,11 +81,10 @@ private:
     // interaction
     //-------------
 public:
-    void insert(QPointF globPos);
-    void select(QPointF globPos, bool extended);
-    void remove(QPointF globPos);
-    void removeSelected();
-    void moveSelected(QPointF t);
+    void processInteraction(Interaction& interaction);
+    void setTool(Tool* tool);
+private:
+    Tool* _tool = 0;
 
 
     //--------------
@@ -91,6 +92,7 @@ public:
     //--------------
 public:
     QItemSelectionModel* selectionModel() const { return _selectionModel; }
+    QList<Object*> selectedObjects() const;
 private:
     QItemSelectionModel* _selectionModel = 0;
 

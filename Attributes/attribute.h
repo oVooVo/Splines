@@ -20,6 +20,11 @@ class Attribute : public QObject
 public:
     Attribute();
     Attribute(QDataStream& stream);
+    template<typename T> T* cast() const
+    {
+        return (T*) this;
+    }
+
 protected:
     virtual void serialize(QDataStream& out) const;
     static Attribute* deserialize(QDataStream& stream);

@@ -3,6 +3,7 @@
 #include "Objects/spline.h"
 #include <QStringList>
 #include <QMimeData>
+#include "Tools/newpointtool.h"
 
 QList<QModelIndex> Scene::_draggedObjects;
 
@@ -11,6 +12,8 @@ Scene::Scene(Root *root)
     _root = root;
     connect(_root, SIGNAL(changed()), this, SIGNAL(changed()));
     _selectionModel = new QItemSelectionModel(this);
+
+    _tool = new NewPointTool();
 }
 
 Scene::~Scene()
@@ -243,41 +246,6 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
     return false;
 }
 
-void Scene::insert(QPointF globPos)
-{
-    for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        getObject(index)->insert(globPos);
-    }
-}
-
-void Scene::select(QPointF globPos, bool extended)
-{
-    for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        getObject(index)->select(globPos, extended);
-    }
-}
-
-void Scene::removeSelected()
-{
-    for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        getObject(index)->removeSelected();
-    }
-}
-
-void Scene::remove(QPointF globPos)
-{
-    for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        getObject(index)->remove(globPos);
-    }
-}
-
-void Scene::moveSelected(QPointF globPos)
-{
-    for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        getObject(index)->moveSelected(globPos);
-    }
-}
-
 quint64 Scene::requestId()
 {
     if (_freeIds.isEmpty()) {
@@ -285,6 +253,25 @@ quint64 Scene::requestId()
     } else {
         return _freeIds.dequeue();
     }
+}
+
+QList<Object*> Scene::selectedObjects() const
+{
+    QList<Object*> list;
+    for (QModelIndex index : selectionModel()->selection().indexes())
+        list << getObject(index);
+    return list;
+}
+
+void Scene::processInteraction(Interaction &interaction)
+{
+    if (!_tool) return;
+
+    _tool->config(interaction);
+    for (Object* o : selectedObjects()) {
+        _tool->perform(o);
+    }
+
 }
 
 

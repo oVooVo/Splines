@@ -36,7 +36,11 @@ SOURCES += main.cpp\
     AttributeWidgets/stringwidget.cpp \
     testobject.cpp \
     Attributes/typeattribute.cpp \
-    AttributeWidgets/typewidget.cpp
+    AttributeWidgets/typewidget.cpp \
+    interaction.cpp \
+    Tools/tool.cpp \
+    Tools/newpointtool.cpp \
+    Objects/pointobject.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -60,7 +64,11 @@ HEADERS  += mainwindow.h \
     AttributeWidgets/stringwidget.h \
     testobject.h \
     Attributes/typeattribute.h \
-    AttributeWidgets/typewidget.h
+    AttributeWidgets/typewidget.h \
+    interaction.h \
+    Tools/tool.h \
+    Tools/newpointtool.h \
+    Objects/pointobject.h
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \

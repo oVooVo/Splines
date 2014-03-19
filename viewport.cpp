@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QTimer>
+#include "interaction.h"
 
 Viewport::Viewport(QWidget *parent) : QWidget(parent)
 {
@@ -38,31 +39,36 @@ void Viewport::mousePressEvent(QMouseEvent *event)
 {
     QPointF pos = map(event->pos());
     _lastMousePos = pos;
-    if (_scene) {
-        switch (event->button()) {
-        case Qt::LeftButton :
-            if (insertMode) _scene->insert(pos);
-            else _scene->select(pos, event->modifiers() == Qt::CTRL);
-            break;
-        case Qt::RightButton:
-            _scene->remove(pos);
-            break;
-        case Qt::MiddleButton:
-        default:
-            break;
-        }
-    }
+
+    Interaction interaction(event->button(), pos, Interaction::SingleClick, event->modifiers());
+    _scene->processInteraction(interaction);
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event)
 {
     QPointF pos = map(event->pos());
     QPointF t = pos - _lastMousePos;
-
-    if (_scene) {
-        _scene->moveSelected(t);
-    }
+    Interaction interaction(t, event->modifiers());
+    _scene->processInteraction(interaction);
     _lastMousePos = map(event->pos());
+}
+
+void Viewport::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    QPointF pos = map(event->pos());
+    _lastMousePos = pos;
+
+    Interaction interaction(event->button(), pos, Interaction::DoubleClick, event->modifiers());
+    _scene->processInteraction(interaction);
+}
+
+void Viewport::mouseReleaseEvent(QMouseEvent *event)
+{
+    QPointF pos = map(event->pos());
+    _lastMousePos = pos;
+
+    Interaction interaction(event->button(), pos, Interaction::DoubleClick, event->modifiers());
+    _scene->processInteraction(interaction);
 }
 
 QPointF Viewport::map(QPointF p) const
