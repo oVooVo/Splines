@@ -6,6 +6,7 @@
 #include "scene.h"
 #include "viewport.h"
 #include "Objects/spline.h"
+#include <QActionGroup>
 
 
 namespace Ui {
@@ -20,6 +21,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+
 public slots:
     void addSpline();
 
@@ -32,6 +34,10 @@ private:
     Scene* _scene;
     QString _filepath;
     QString fileDialogDirectory() const;
+    void createToolMenu();
+
+    QMenu* _toolMenu = 0;
+    QActionGroup* _toolMenuActionGroup = 0;
 
 };
 

@@ -7,12 +7,14 @@
 
 class NewPointTool : public Tool
 {
+    Q_OBJECT
 public:
     NewPointTool();
     void perform(Object *o);
 
 private:
     QPointF _pos;
+    REGISTER_DECL_TOOLTYPE(NewPointTool);
 
 };
 

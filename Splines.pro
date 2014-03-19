@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     interaction.cpp \
     Tools/tool.cpp \
     Tools/newpointtool.cpp \
-    Objects/pointobject.cpp
+    Objects/pointobject.cpp \
+    Tools/selectiontool.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -68,7 +69,8 @@ HEADERS  += mainwindow.h \
     interaction.h \
     Tools/tool.h \
     Tools/newpointtool.h \
-    Objects/pointobject.h
+    Objects/pointobject.h \
+    Tools/selectiontool.h
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \

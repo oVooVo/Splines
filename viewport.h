@@ -10,8 +10,6 @@ public:
     Viewport(QWidget* parent = 0);
     void setScene(Scene* scene);
     Scene* scene() const { return _scene; }
-    bool insertMode;
-
 
 protected:
     void paintEvent(QPaintEvent *);

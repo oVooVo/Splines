@@ -12,8 +12,6 @@ Scene::Scene(Root *root)
     _root = root;
     connect(_root, SIGNAL(changed()), this, SIGNAL(changed()));
     _selectionModel = new QItemSelectionModel(this);
-
-    _tool = new NewPointTool();
 }
 
 Scene::~Scene()
@@ -272,6 +270,12 @@ void Scene::processInteraction(Interaction &interaction)
         _tool->perform(o);
     }
 
+}
+
+void Scene::setTool(Tool *tool)
+{
+    if (_tool) delete _tool;
+    _tool = tool;
 }
 
 

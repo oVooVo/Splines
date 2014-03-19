@@ -82,7 +82,7 @@ private:
     //-------------
 public:
     void processInteraction(Interaction& interaction);
-    void setTool(Tool* tool);
+    void setTool(Tool* tool = 0);
 private:
     Tool* _tool = 0;
 

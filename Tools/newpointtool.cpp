@@ -3,6 +3,8 @@
 #include "Objects/pointobject.h"
 #include "point.h"
 
+REGISTER_DEFN_TOOLTYPE(NewPointTool);
+
 NewPointTool::NewPointTool()
 {
 }
