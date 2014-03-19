@@ -6,13 +6,13 @@
 #include <QWidget>
 
 
-
+/*
+ *  Do not use the register_defines.h registration system because AttributeWidget constructor takes arguments!
+ */
 class AttributeWidget;
-// convienience define to save typing the type often
 #define ATTRIBUTEWIDGET_CREATOR_MAP_TYPE QMap<QString, AttributeWidget* (*)(QList<Attribute*>&)>
-
-//creates a new AttributeWidget of Type T out of a given attributeList.
 template<typename T> AttributeWidget *createAttributeWidget(QList<Attribute*> &attributes) { return new T(attributes); }
+
 
 
 /**

@@ -9,6 +9,8 @@ AttributeManager::AttributeManager(QWidget *parent) :
 {
     _scrollArea = new QScrollArea(this);
     setWidget(_scrollArea);
+
+    setWindowTitle("Attribute Manager");
 }
 
 void AttributeManager::setSelection(QList<Object*> objects)

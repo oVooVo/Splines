@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     viewport.cpp \
     testobject.cpp \
     interaction.cpp \
-    action.cpp \
     Attributes/attribute.cpp \
     Attributes/stringattribute.cpp \
     Attributes/transformationattribute.cpp \
@@ -74,7 +73,8 @@ HEADERS  += mainwindow.h \
     Tools/selectiontool.h \
     Tests/unittester.h \
     Tests/unittest.h \
-    Attributes/transformationattributetest.h
+    Attributes/transformationattributetest.h \
+    register_defines.h
 
 
 FORMS    += mainwindow.ui \

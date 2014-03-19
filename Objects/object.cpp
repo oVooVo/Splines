@@ -9,7 +9,7 @@
 #include "Attributes/stringattribute.h"
 
 
-OBJECT_CREATOR_MAP_TYPE *Object::_creatorMap = 0;
+INIT_CREATOR_MAP(Object);
 
 Object::Object(Object *parent) : QObject(parent)
 {
@@ -291,17 +291,4 @@ QDataStream& operator>>(QDataStream& stream, Object* &o)
         Q_ASSERT_X(o, "Object::deserialize", "deserialization failed.");
     }
     return stream;
-}
-
-Object *Object::createInstance(QString className)
-{
-    if (!_creatorMap)
-    {
-        _creatorMap = new OBJECT_CREATOR_MAP_TYPE();
-    }
-
-    OBJECT_CREATOR_MAP_TYPE::iterator it = _creatorMap->find(className);
-    if (it == _creatorMap->end())
-        return 0;
-    return (it.value())();
 }

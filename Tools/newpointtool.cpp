@@ -3,7 +3,7 @@
 #include "Objects/pointobject.h"
 #include "point.h"
 
-REGISTER_DEFN_TOOLTYPE(NewPointTool);
+REGISTER_DEFN_TYPE(Tool, NewPointTool);
 
 NewPointTool::NewPointTool()
 {

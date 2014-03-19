@@ -115,6 +115,8 @@ QMenu* MainWindow::createManagerMenu()
         connect(action, &QAction::triggered, [this, classname]() {
             Manager* manager = Manager::createInstance(classname);
             addManager(manager);
+            manager->setParent(this);
+            manager->setFloating(true);
             manager->show();
         });
     };
@@ -146,19 +148,21 @@ template<typename T> QMenu* MainWindow::createMenu(CONNECT_ACTION_TYPE connectAc
     QList<QAction*> actions;
     for (QString classname : classnames) {
         T* t = T::createInstance(classname);
-        QAction* action = new QAction(menu);
-        connectAction(classname, action);
-        action->setParent(menu);
-        action->setActionGroup(group);
-        action->setText(t->actionText());
-        action->setToolTip(t->toolTip());
-        action->setIcon(t->icon());
-        actions << action;
-        action->setCheckable(t->isCheckable());
-        if (action->isCheckable()) {
-            connect(_scene, &Scene::destroyed, [action]() {
-                action->setChecked(false);
-            });
+        if (t->makeAction()) {
+            QAction* action = new QAction(menu);
+            connectAction(classname, action);
+            action->setParent(menu);
+            action->setActionGroup(group);
+            action->setText(t->actionText());
+            action->setToolTip(t->toolTip());
+            action->setIcon(t->icon());
+            action->setCheckable(t->isCheckable());
+            if (action->isCheckable()) {
+                connect(_scene, &Scene::destroyed, [action]() {
+                    action->setChecked(false);
+                });
+            }
+            actions << action;
         }
         delete t;
     }

@@ -5,7 +5,7 @@
 #include <QMatrix3x3>
 #include "Attributes/typeattribute.h"
 
-REGISTER_DEFN_OBJECTTYPE(Spline);
+REGISTER_DEFN_TYPE(Object, Spline);
 
 Spline::Spline(Object *parent) : PointObject(parent)
 {

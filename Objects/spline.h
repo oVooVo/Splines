@@ -29,7 +29,7 @@ public:
 
 
 private:
-    REGISTER_DECL_OBJECTTYPE(Spline);
+    REGISTER_DECL_TYPE(Object, Spline);
 };
 
 #endif // SPLINE_H

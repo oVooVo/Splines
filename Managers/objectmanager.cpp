@@ -21,6 +21,7 @@ ObjectManager::ObjectManager(QWidget *parent) :
     _treeView->setAcceptDrops(true);
     _treeView->setDropIndicatorShown(true);
     setWidget(_treeView);
+    setWindowTitle("Object Manager");
 }
 
 void ObjectManager::keyPressEvent(QKeyEvent *event)

@@ -9,15 +9,14 @@
 #include <QMap>
 #include "interaction.h"
 #include "action.h"
+#include "register_defines.h"
 
-
-class Object;
-#define OBJECT_CREATOR_MAP_TYPE QMap<QString, Object* (*)()>
-template<typename T> Object *createObject() { return new T(); }
 
 class Object : public QObject, public Action
 {
     Q_OBJECT
+    DECL_MEMBER(Object)
+
 public:
 
     //------------------------------
@@ -287,38 +286,14 @@ public:
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
     bool isCheckable() const { return false; }
-    static QStringList types() { return _creatorMap->keys(); }
 
 
 
 signals:
     void changed();
-
-protected:
-    static OBJECT_CREATOR_MAP_TYPE *_creatorMap;
-public:
-    static Object *createInstance(QString className);
-
-
-
 };
 
-template<typename T>
-struct ObjectRegister : Object
-{
-    ObjectRegister(QString className) : Object()
-    {
-        if (!_creatorMap)
-            _creatorMap = new OBJECT_CREATOR_MAP_TYPE();
-        _creatorMap->insert(className, &createObject<T>);
-    }
-};
-
-#define REGISTER_DECL_OBJECTTYPE(CLASSNAME) \
-    static ObjectRegister<CLASSNAME> reg
-
-#define REGISTER_DEFN_OBJECTTYPE(CLASSNAME) \
-    ObjectRegister<CLASSNAME> CLASSNAME::reg(#CLASSNAME)
+REGISTERER(Object)
 
 QDataStream& operator<<(QDataStream& stream, const Object* o);
 QDataStream& operator>>(QDataStream& stream, Object* &o);

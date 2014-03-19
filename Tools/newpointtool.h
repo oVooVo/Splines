@@ -14,7 +14,7 @@ public:
 
 private:
     QPointF _pos;
-    REGISTER_DECL_TOOLTYPE(NewPointTool);
+    REGISTER_DECL_TYPE(Tool, NewPointTool);
 
 };
 

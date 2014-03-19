@@ -1,6 +1,6 @@
 #include "selectiontool.h"
 
-REGISTER_DEFN_TOOLTYPE(SelectionTool);
+REGISTER_DEFN_TYPE(Tool, SelectionTool);
 
 SelectionTool::SelectionTool()
 {

@@ -11,8 +11,10 @@ public:
 
     void drawIndividual(QPainter &painter);
 
+    bool makeAction() const { return false; }
+
 private:
-    REGISTER_DECL_OBJECTTYPE(Root);
+    REGISTER_DECL_TYPE(Object, Root);
 };
 
 #endif // ROOT_H
