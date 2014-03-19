@@ -7,8 +7,9 @@ PointObject::PointObject(Object* parent)  : Object(parent)
 
 }
 
-PointObject::PointObject(QDataStream& stream) : Object(stream)
+void PointObject::deserialize(QDataStream &stream)
 {
+    Object::deserialize(stream);
     stream >> _points;
     for (Point* p : _points)
         if (p->isSelected()) _selected.append(p);

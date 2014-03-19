@@ -44,14 +44,18 @@ private:
      * @brief createMenu creates a Menu out of Registered classes
      * @return
      */
-    template<typename T> QMenu* createMenu(std::function<QAction*(T*, QString)> makeAction, QString name);
+#define CONNECT_ACTION_TYPE std::function<void(const QString&, const QAction*)>
+    template<typename T> QMenu* createMenu(CONNECT_ACTION_TYPE connectAction, QString name);
+
 
     QMenu* createToolMenu();
     QMenu* _toolMenu = 0;
-
     QMenu* createManagerMenu();
     QMenu* _managerMenu = 0;
+    QMenu* createNewObjectsMenu();
+    QMenu* _newObjectsMenu = 0;
 
 };
 
 #endif // MAINWINDOW_H
+

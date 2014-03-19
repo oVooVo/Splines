@@ -4,12 +4,13 @@
 #include <QDockWidget>
 #include "scene.h"
 #include <QIcon>
+#include <action.h>
 
 class Manager;
 #define MANAGER_CREATOR_MAP_TYPE QMap<QString, Manager* (*)(QWidget*)>
 template<typename T> Manager *createManager(QWidget* parent) { return new T(parent); }
 
-class Manager : public QDockWidget
+class Manager : public QDockWidget, public Action
 {
     Q_OBJECT
 public:
@@ -19,17 +20,17 @@ public:
     Scene* scene() const { return _scene; }
     virtual void setScene(Scene* s);
 
-    static MANAGER_CREATOR_MAP_TYPE* creatorMap() { return _creatorMap; }
     static Manager *createInstance(QString classname, QWidget* parent = 0);
-    static QStringList types() { return creatorMap()->keys(); }
 
     //TODO same methodes in Tool => ...
-    virtual QString name() const { return QString(metaObject()->className()); }
+    virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
+    bool isCheckable() const { return false; }
+    static QStringList types() { return _creatorMap->keys(); }
 
 private:
-    Scene* _scene;
+    Scene* _scene = 0;
 
 protected:
     static MANAGER_CREATOR_MAP_TYPE *_creatorMap;

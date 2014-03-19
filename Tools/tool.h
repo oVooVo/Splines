@@ -4,14 +4,14 @@
 #include "Objects/object.h"
 #include "interaction.h"
 #include <QObject>
-#include <QIcon>
+#include "action.h"
 
 
 class Tool;
 #define TOOL_CREATOR_MAP_TYPE QMap<QString, Tool* (*)()>
 template<typename T> Tool *createTool() { return new T(); }
 
-class Tool : public QObject
+class Tool : public QObject, public Action
 {
     Q_OBJECT
 public:
@@ -22,17 +22,13 @@ public:
 
     Interaction interaction() const { return _interaction; }
 
-    /*
-     * Following might hurt Model <-> View, but i guess its the most convienient... */
-    virtual QString name() const { return QString(metaObject()->className()); }
+    virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
-    virtual QIcon icon() const { return QIcon(); } /*
-     *
-     */
+    virtual QIcon icon() const { return QIcon(); }
+    bool isCheckable() const { return true; }
 
-    static TOOL_CREATOR_MAP_TYPE* creatorMap() { return _creatorMap; }
     static Tool *createInstance(QString className);
-    static QStringList types() { return creatorMap()->keys(); }
+    static QStringList types() { return _creatorMap->keys(); }
 
 
 private:

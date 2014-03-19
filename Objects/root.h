@@ -8,12 +8,8 @@ class Root : public Object
     Q_OBJECT
 public:
     Root(Root* parent = 0);
-    Root(QDataStream& stream);
 
     void drawIndividual(QPainter &painter);
-
-public:
-    void serialize(QDataStream& stream) const;
 
 private:
     REGISTER_DECL_OBJECTTYPE(Root);

@@ -8,13 +8,14 @@
 #include <QHash>
 #include <QMap>
 #include "interaction.h"
+#include "action.h"
 
 
 class Object;
-#define OBJECT_CREATOR_MAP_TYPE QMap<QString, Object* (*)(QDataStream&)>
-template<typename T> Object *createObjectFromStream(QDataStream& stream) { return new T(stream); }
+#define OBJECT_CREATOR_MAP_TYPE QMap<QString, Object* (*)()>
+template<typename T> Object *createObject() { return new T(); }
 
-class Object : public QObject
+class Object : public QObject, public Action
 {
     Q_OBJECT
 public:
@@ -30,11 +31,6 @@ public:
      */
     Object(Object* parent = 0);
 
-    /**
-     * @brief Object creates new Object out of a QDataStream. Use this constructor only in context of serialization
-     * @param stream the object is created from data of this stream
-     */
-    Object(QDataStream& stream);
 
     /**
      * @brief ~Object destructs this object, all children and all attributes.
@@ -250,16 +246,19 @@ public:
 
     static QStringList attributeKeys(QString classname);
 
-    //------------------
-    // serilization
-    //------------------
+
+
+
+    //------------------------------
+    //
+    // serialization
+    //
+    //------------------------------
 public:
     virtual void serialize(QDataStream& stream) const;
-    static Object* deserialize(QDataStream& stream);
+    virtual void deserialize(QDataStream& stream);
     friend QDataStream& operator<<(QDataStream& stream, const Object* o);
     friend QDataStream& operator>>(QDataStream& stream, Object* &o);
-
-    QPointF map(QPointF pos, bool translate = true) const;
 private:
     /**
      * @brief _deserialize_mode switch that indicates deserialization mode. Some methods work different in this mode,
@@ -267,18 +266,29 @@ private:
      */
     bool _deserialize_mode = false;
 
-/*
-    //------------------
-    // interaction
-    //------------------
+
+
+    //------------------------------
+    //
+    // ???
+    //
+    //------------------------------
 public:
-    virtual void processInteraction(Interaction&) {}
-    virtual void insert(QPointF globalPos);
-    virtual void select(QPointF globalPos, bool extended);
-    virtual void remove(QPointF globalPos);
-    virtual void removeSelected() {}
-    virtual void moveSelected(QPointF t);
-    */
+    QPointF map(QPointF pos, bool translate = true) const;
+
+
+    //------------------------------
+    //
+    // To generate menu entries
+    //
+    //------------------------------
+public:
+    virtual QString actionText() const { return QString(metaObject()->className()); }
+    virtual QString toolTip() const { return QString(); }
+    virtual QIcon icon() const { return QIcon(); }
+    bool isCheckable() const { return false; }
+    static QStringList types() { return _creatorMap->keys(); }
+
 
 
 signals:
@@ -286,7 +296,8 @@ signals:
 
 protected:
     static OBJECT_CREATOR_MAP_TYPE *_creatorMap;
-    static Object *createInstance(QString className, QDataStream &stream);
+public:
+    static Object *createInstance(QString className);
 
 
 
@@ -299,7 +310,7 @@ struct ObjectRegister : Object
     {
         if (!_creatorMap)
             _creatorMap = new OBJECT_CREATOR_MAP_TYPE();
-        _creatorMap->insert(className, &createObjectFromStream<T>);
+        _creatorMap->insert(className, &createObject<T>);
     }
 };
 

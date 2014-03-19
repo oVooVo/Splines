@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     viewport.cpp \
     testobject.cpp \
     interaction.cpp \
+    action.cpp \
     Attributes/attribute.cpp \
     Attributes/stringattribute.cpp \
     Attributes/transformationattribute.cpp \
@@ -36,13 +37,13 @@ SOURCES += main.cpp\
     Objects/root.cpp \
     Managers/attributemanager.cpp \
     Managers/manager.cpp \
+    Managers/objectmanager.cpp \
     Tools/tool.cpp \
     Tools/newpointtool.cpp \
     Tools/selectiontool.cpp \
     Tests/unittester.cpp \
     Tests/unittest.cpp \
-    Attributes/transformationattributetest.cpp \
-    Managers/objectmanager.cpp
+    Attributes/transformationattributetest.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -50,6 +51,7 @@ HEADERS  += mainwindow.h \
     viewport.h \
     testobject.h \
     interaction.h \
+    action.h \
     Attributes/attribute.h \
     Attributes/stringattribute.h \
     Attributes/transformationattribute.h \
@@ -66,13 +68,13 @@ HEADERS  += mainwindow.h \
     Objects/root.h \
     Managers/attributemanager.h \
     Managers/manager.h \
+    Managers/objectmanager.h \
     Tools/tool.h \
     Tools/newpointtool.h \
     Tools/selectiontool.h \
     Tests/unittester.h \
     Tests/unittest.h \
-    Attributes/transformationattributetest.h \
-    Managers/objectmanager.h
+    Attributes/transformationattributetest.h
 
 
 FORMS    += mainwindow.ui \

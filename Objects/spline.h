@@ -11,7 +11,6 @@ class Spline : public PointObject
     Q_OBJECT
 public:
     Spline(Object* parent = 0);
-    Spline(QDataStream& stream);
     QPointF operator() (qreal t) const { return at(t); }
     QPointF at(qreal t) const;
 

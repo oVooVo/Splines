@@ -14,10 +14,6 @@ Spline::Spline(Object *parent) : PointObject(parent)
     addAttribute("SplineType", new TypeAttribute("Spline type:", splineTypes));
 }
 
-Spline::Spline(QDataStream &stream) : PointObject(stream)
-{
-}
-
 void Spline::serialize(QDataStream &stream) const
 {
     PointObject::serialize(stream);

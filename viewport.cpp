@@ -13,8 +13,9 @@ void Viewport::setScene(Scene *scene)
 {
     if (_scene == scene) return;
 
-    if (_scene)
+    if (_scene) {
         disconnect(_scene, 0, this, 0);
+    }
 
     _scene = scene;
 

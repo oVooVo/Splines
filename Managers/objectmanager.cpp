@@ -20,6 +20,7 @@ ObjectManager::ObjectManager(QWidget *parent) :
     _treeView->setDragEnabled(true);
     _treeView->setAcceptDrops(true);
     _treeView->setDropIndicatorShown(true);
+    setWidget(_treeView);
 }
 
 void ObjectManager::keyPressEvent(QKeyEvent *event)

@@ -17,9 +17,11 @@ Object::Object(Object *parent) : QObject(parent)
     addAttribute("NameAttribute", new StringAttribute("Name:", genericName()));
 }
 
-Object::Object(QDataStream &stream)
+void Object::deserialize(QDataStream &stream)
 {
     stream >> _id;
+
+    qDeleteAll(_attributes);
     stream >> _attributes;
     for (Attribute* a : _attributes) {
         connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
@@ -36,27 +38,9 @@ Object::Object(QDataStream &stream)
 
 void Object::serialize(QDataStream &stream) const
 {
-    //class name
-    stream << QString(metaObject()->className());
-
-    //object attributes
     stream << id();
     stream << _attributes;
-
     stream << children();
-}
-
-Object* Object::deserialize(QDataStream &stream)
-{
-    QString classname;
-    stream >> classname;
-
-    Object* object = createInstance(classname, stream);
-    if (!object) {
-        qWarning() << "Warning: Classname " << classname << "not found.";
-        Q_ASSERT_X(object, "Object::deserialize", "deserialization failed.");
-    }
-    return object;
 }
 
 Object::~Object()
@@ -290,17 +274,26 @@ QList<quint64> Object::idsOfAllDescendants() const
 
 QDataStream& operator<<(QDataStream& stream, const Object* o)
 {
+    stream << QString(o->metaObject()->className());
     o->serialize(stream);
     return stream;
 }
 
 QDataStream& operator>>(QDataStream& stream, Object* &o)
 {
-    o = Object::deserialize(stream);
+    QString classname;
+    stream >> classname;
+
+    o = Object::createInstance(classname);
+    o->deserialize(stream);
+    if (!o) {
+        qWarning() << "Warning: Classname " << classname << "not found.";
+        Q_ASSERT_X(o, "Object::deserialize", "deserialization failed.");
+    }
     return stream;
 }
 
-Object *Object::createInstance(QString className, QDataStream& stream)
+Object *Object::createInstance(QString className)
 {
     if (!_creatorMap)
     {
@@ -310,5 +303,5 @@ Object *Object::createInstance(QString className, QDataStream& stream)
     OBJECT_CREATOR_MAP_TYPE::iterator it = _creatorMap->find(className);
     if (it == _creatorMap->end())
         return 0;
-    return (it.value())(stream);
+    return (it.value())();
 }

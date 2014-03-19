@@ -8,5 +8,5 @@ SelectionTool::SelectionTool()
 
 void SelectionTool::perform(Object *o)
 {
-
+    Q_UNUSED(o);
 }

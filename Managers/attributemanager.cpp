@@ -7,11 +7,8 @@ REGISTER_DEFN_MANAGAERTYPE(AttributeManager);
 AttributeManager::AttributeManager(QWidget *parent) :
     Manager(parent)
 {
-    QVBoxLayout* l = new QVBoxLayout(this);
     _scrollArea = new QScrollArea(this);
-    l->setContentsMargins(0, 0, 0, 0);
-    l->addWidget(_scrollArea);
-    setLayout(l);
+    setWidget(_scrollArea);
 }
 
 void AttributeManager::setSelection(QList<Object*> objects)
@@ -80,5 +77,6 @@ void AttributeManager::setScene(Scene *s)
         connect(scene()->selectionModel(), &QItemSelectionModel::selectionChanged, [this]() {
             setSelection(scene()->selectedObjects());
         });
+        setSelection(scene()->selectedObjects());
     }
 }

@@ -9,7 +9,6 @@ class PointObject : public Object
     Q_OBJECT
 public:
     PointObject(Object* parent = 0);
-    PointObject(QDataStream& stream);
     virtual ~PointObject();
 
     virtual void addPoint(Point* p);
@@ -17,7 +16,8 @@ public:
 protected:
     QList<Point*> points() const { return _points; }
     QList<Point*> selection() const { return _selected; }
-    void serialize(QDataStream &stream) const;
+    virtual void serialize(QDataStream &stream) const;
+    virtual void deserialize(QDataStream &stream);
 
 private:
     QList<Point*> _points;

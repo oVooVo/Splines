@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     menuBar()->addMenu(createToolMenu());
     menuBar()->addMenu(createManagerMenu());
+    menuBar()->addMenu(createNewObjectsMenu());
 
 }
 
@@ -38,6 +39,7 @@ void MainWindow::save()
 {
     if (_filepath.isEmpty()) {
         saveAs();
+        return;
     }
 
     QFile file(_filepath);
@@ -62,92 +64,103 @@ void MainWindow::saveAs()
 void MainWindow::load()
 {
     _filepath = QFileDialog::getOpenFileName(this, "Open Project", fileDialogDirectory());
-
     if (_filepath.isEmpty()) return;
-    delete _scene;
 
     QFile file(_filepath);
     file.open(QIODevice::ReadWrite);
     QDataStream stream(&file);
-    stream >> _scene;
+    Scene* scene;
+    stream >> scene;
+    setScene(scene);
 
-    createToolMenu();
 }
 
 void MainWindow::setScene(Scene *scene)
 {
+    ui->viewport->setScene(scene); //TODO: viewport should be a manager too! (but no QDockWidget...)
+    for (Manager* manager : _managers) {
+        manager->setScene(scene);
+    }
+
     if (_scene)
         delete _scene;  //all connections that target _scene were destroyed :)
 
     _scene = scene;
 
-    ui->viewport->setScene(_scene); //TODO: viewport should be a manager too! (but no QDockWidget...)
-    for (Manager* manager : _managers) {
-        manager->setScene(_scene);
-    }
 }
 
 void MainWindow::addManager(Manager *manager)
 {
+    manager->setScene(_scene);
     _managers.append(manager);
 }
 
 QMenu* MainWindow::createToolMenu()
 {
-    std::function<QAction*(Tool*, QString)> makeAction = [this](Tool* t, QString key) -> QAction* {
-        QAction* action = new QAction(0);
-        action->setCheckable(true);
-        action->setText(t->name());
-        action->setToolTip(t->toolTip());
-        action->setIcon(t->icon());
-        connect(action, &QAction::toggled, [this, key](bool on) {
+    auto connectAction = [this](const QString& classname, const QAction* action) {
+        connect(action, &QAction::toggled, [this, classname](bool on) {
             if (!on) return;
             if (!_scene) return;
-            _scene->setTool(Tool::createInstance(key));
-        });
-        connect(_scene, &Scene::destroyed, [action]() {
-           action->setChecked(false);
+            _scene->setTool(Tool::createInstance(classname));
         });
         return action;
     };
 
-    return createMenu<Tool>(makeAction, "Tool Menu");
+    return createMenu<Tool>(connectAction, "Tool Menu");
 }
 
 QMenu* MainWindow::createManagerMenu()
 {
-    std::function<QAction*(Manager*, QString)> makeAction = [this](Manager* t, QString key) -> QAction* {
-        QAction* action = new QAction(0);
-        action->setText(t->name());
-        action->setToolTip(t->toolTip());
-        action->setIcon(t->icon());
-        connect(action, &QAction::triggered, [this, key]() {
-            Manager* manager = Manager::createInstance(key);
+    auto connectAction = [this](const QString& classname, const QAction* action) {
+        connect(action, &QAction::triggered, [this, classname]() {
+            Manager* manager = Manager::createInstance(classname);
             addManager(manager);
             manager->show();
         });
-        return action;
     };
 
-    return createMenu<Manager>(makeAction, "Manager Menu");
+    return createMenu<Manager>(connectAction, "Manager Menu");
 }
 
-template<typename T> QMenu* MainWindow::createMenu(std::function<QAction*(T*, QString)> makeAction, QString name)
+QMenu* MainWindow::createNewObjectsMenu()
+{
+    auto connectAction = [this](const QString& classname, const QAction* action) {
+        connect(action, &QAction::triggered, [this, classname]() {
+            if (_scene) {
+                _scene->addObject(Object::createInstance(classname));
+            }
+        });
+    };
+
+    return createMenu<Object>(connectAction, "Add Object");
+}
+
+template<typename T> QMenu* MainWindow::createMenu(CONNECT_ACTION_TYPE connectAction, QString name)
 {
     QMenu* menu = new QMenu(name, this);
 
-    QStringList keys = T::types();
-    qSort(keys);
+    QStringList classnames = T::types();
+    qSort(classnames);
 
     QActionGroup* group = new QActionGroup(menu);
     QList<QAction*> actions;
-    for (QString key : keys) {
-        T* t = T::createInstance(key);
-        QAction* action = makeAction(t, key);
-        delete t;
+    for (QString classname : classnames) {
+        T* t = T::createInstance(classname);
+        QAction* action = new QAction(menu);
+        connectAction(classname, action);
         action->setParent(menu);
         action->setActionGroup(group);
+        action->setText(t->actionText());
+        action->setToolTip(t->toolTip());
+        action->setIcon(t->icon());
         actions << action;
+        action->setCheckable(t->isCheckable());
+        if (action->isCheckable()) {
+            connect(_scene, &Scene::destroyed, [action]() {
+                action->setChecked(false);
+            });
+        }
+        delete t;
     }
     menu->addActions(actions);
     return menu;
