@@ -2,8 +2,10 @@
 #include "AttributeWidgets/attributewidget.h"
 #include <QDebug>
 
+REGISTER_DEFN_MANAGAERTYPE(AttributeManager);
+
 AttributeManager::AttributeManager(QWidget *parent) :
-    QWidget(parent)
+    Manager(parent)
 {
     QVBoxLayout* l = new QVBoxLayout(this);
     _scrollArea = new QScrollArea(this);
@@ -69,4 +71,14 @@ QList<QWidget*> AttributeManager::getWidgets(QList<Object *> objects)
 
 
     return attributeWidgets;
+}
+
+void AttributeManager::setScene(Scene *s)
+{
+    Manager::setScene(s);
+    if (scene()) {
+        connect(scene()->selectionModel(), &QItemSelectionModel::selectionChanged, [this]() {
+            setSelection(scene()->selectedObjects());
+        });
+    }
 }

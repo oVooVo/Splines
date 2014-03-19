@@ -14,63 +14,66 @@ TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++0x
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
+    point.cpp \
+    scene.cpp \
+    viewport.cpp \
+    testobject.cpp \
+    interaction.cpp \
+    Attributes/attribute.cpp \
+    Attributes/stringattribute.cpp \
+    Attributes/transformationattribute.cpp \
+    Attributes/typeattribute.cpp \
+    AttributeWidgets/attributewidget.cpp \
+    AttributeWidgets/stringwidget.cpp \
+    AttributeWidgets/transformationwidget.cpp \
+    AttributeWidgets/typewidget.cpp \
+    Objects/object.cpp \
+    Objects/pointobject.cpp \
     Objects/spline.cpp \
     Objects/Spline/splinepiece.cpp \
-    point.cpp \
     Objects/Spline/bezierpiece.cpp \
-    scene.cpp \
-    Objects/object.cpp \
     Objects/root.cpp \
-    viewport.cpp \
-    Managers/hierarchieexplorer.cpp \
     Managers/attributemanager.cpp \
-    Attributes/transformationattribute.cpp \
-    Attributes/attribute.cpp \
-    AttributeWidgets/transformationwidget.cpp \
-    Tests/unittester.cpp \
-    Attributes/transformationattributetest.cpp \
-    Tests/unittest.cpp \
-    AttributeWidgets/attributewidget.cpp \
-    Attributes/stringattribute.cpp \
-    AttributeWidgets/stringwidget.cpp \
-    testobject.cpp \
-    Attributes/typeattribute.cpp \
-    AttributeWidgets/typewidget.cpp \
-    interaction.cpp \
+    Managers/manager.cpp \
     Tools/tool.cpp \
     Tools/newpointtool.cpp \
-    Objects/pointobject.cpp \
-    Tools/selectiontool.cpp
+    Tools/selectiontool.cpp \
+    Tests/unittester.cpp \
+    Tests/unittest.cpp \
+    Attributes/transformationattributetest.cpp \
+    Managers/objectmanager.cpp
 
 HEADERS  += mainwindow.h \
+    point.h \
+    scene.h \
+    viewport.h \
+    testobject.h \
+    interaction.h \
+    Attributes/attribute.h \
+    Attributes/stringattribute.h \
+    Attributes/transformationattribute.h \
+    Attributes/typeattribute.h \
+    AttributeWidgets/attributewidget.h \
+    AttributeWidgets/stringwidget.h \
+    AttributeWidgets/transformationwidget.h \
+    AttributeWidgets/typewidget.h \
+    Objects/object.h \
+    Objects/pointobject.h \
     Objects/spline.h \
     Objects/Spline/splinepiece.h \
-    point.h \
     Objects/Spline/bezierpiece.h \
-    scene.h \
-    Objects/object.h \
     Objects/root.h \
-    viewport.h \
-    Managers/hierarchieexplorer.h \
     Managers/attributemanager.h \
-    Attributes/transformationattribute.h \
-    Attributes/attribute.h \
-    AttributeWidgets/transformationwidget.h \
-    Tests/unittester.h \
-    Attributes/transformationattributetest.h \
-    Tests/unittest.h \
-    AttributeWidgets/attributewidget.h \
-    Attributes/stringattribute.h \
-    AttributeWidgets/stringwidget.h \
-    testobject.h \
-    Attributes/typeattribute.h \
-    AttributeWidgets/typewidget.h \
-    interaction.h \
+    Managers/manager.h \
     Tools/tool.h \
     Tools/newpointtool.h \
-    Objects/pointobject.h \
-    Tools/selectiontool.h
+    Tools/selectiontool.h \
+    Tests/unittester.h \
+    Tests/unittest.h \
+    Attributes/transformationattributetest.h \
+    Managers/objectmanager.h
+
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \

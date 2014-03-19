@@ -61,36 +61,6 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dockWidget">
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="HierarchieExplorer" name="treeView"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget_4">
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4">
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="AttributeManager" name="attributeManager" native="true"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <action name="actionNewSpline">
    <property name="text">
     <string>Spline</string>
@@ -121,17 +91,6 @@
    <class>Viewport</class>
    <extends>QWidget</extends>
    <header>viewport.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>HierarchieExplorer</class>
-   <extends>QTreeView</extends>
-   <header>Managers/hierarchieexplorer.h</header>
-  </customwidget>
-  <customwidget>
-   <class>AttributeManager</class>
-   <extends>QWidget</extends>
-   <header>Managers/attributemanager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

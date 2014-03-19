@@ -9,25 +9,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    _scene = new Scene();
+    setScene(new Scene());
 
-    ui->viewport->setScene(_scene);
-    ui->treeView->setModel(_scene);
-
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, [this](){
-       QList<Object*> selection;
-       for (QModelIndex i : ui->treeView->selectionModel()->selection().indexes())
-           selection.append(ui->treeView->model()->getObject(i));
-       ui->attributeManager->setSelection(selection);
-    });
-    connect(ui->actionNewSpline, &QAction::triggered, [this]() { _scene->addObject(new Spline()); });
     connect(ui->actionSpeichern, SIGNAL(triggered()), this, SLOT(save()));
     connect(ui->actionSpeichern_unter, SIGNAL(triggered()), this, SLOT(saveAs()));
     connect(ui->action_ffnen, SIGNAL(triggered()), this, SLOT(load()));
-    connect(_scene, SIGNAL(changed()), ui->treeView, SLOT(update()));
 
-    createToolMenu();
-    menuBar()->addMenu(_toolMenu);
+
+    connect(ui->actionNewSpline, &QAction::triggered, [this]() { _scene->addObject(new Spline()); });
+
+
+    menuBar()->addMenu(createToolMenu());
+    menuBar()->addMenu(createManagerMenu());
+
 }
 
 MainWindow::~MainWindow()
@@ -68,77 +62,123 @@ void MainWindow::saveAs()
 void MainWindow::load()
 {
     _filepath = QFileDialog::getOpenFileName(this, "Open Project", fileDialogDirectory());
+
     if (_filepath.isEmpty()) return;
-
-    ui->treeView->setModel(0);
-    ui->viewport->setScene(0);
-
-    //TODO encapsulate this to provide multiple attribute managers!
-    ui->attributeManager->disconnect();
-
     delete _scene;
 
     QFile file(_filepath);
     file.open(QIODevice::ReadWrite);
     QDataStream stream(&file);
     stream >> _scene;
-    ui->treeView->setModel(_scene);
-    ui->viewport->setScene(_scene);
-
-    //TODO encapsulate this ...each attribute manager must be connected to each tree view!
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, [this](){
-       QList<Object*> selection;
-       for (QModelIndex i : ui->treeView->selectionModel()->selection().indexes())
-           selection.append(ui->treeView->model()->getObject(i));
-       ui->attributeManager->setSelection(selection);
-    });
-    //connect(_scene, SIGNAL(changed()), ui->treeView, SLOT(update()));
-
-    file.close();
 
     createToolMenu();
 }
-void MainWindow::createToolMenu()
+
+void MainWindow::setScene(Scene *scene)
 {
-    TOOL_CREATOR_MAP_TYPE* _map = Tool::creatorMap();
+    if (_scene)
+        delete _scene;  //all connections that target _scene were destroyed :)
 
-    if (!_toolMenu) {
-        _toolMenu = new QMenu("Tools", this);
-    } else {
-        for (QAction* a : _toolMenu->actions()) {
-            _toolMenu->removeAction(a);
-            delete a;
-        }
-        delete _toolMenuActionGroup;
+    _scene = scene;
+
+    ui->viewport->setScene(_scene); //TODO: viewport should be a manager too! (but no QDockWidget...)
+    for (Manager* manager : _managers) {
+        manager->setScene(_scene);
     }
+}
 
+void MainWindow::addManager(Manager *manager)
+{
+    _managers.append(manager);
+}
 
-    QList<QString> toolClassnames = _map->keys();
-    qSort(toolClassnames);
-
-    QActionGroup* _toolMenuActionGroup = new QActionGroup(_toolMenu);
-    QList<QAction*> actions;
-    for (QString key : toolClassnames) {
-        Tool* t = Tool::createInstance(key);
-        QAction* action = new QAction(_toolMenu);
+QMenu* MainWindow::createToolMenu()
+{
+    std::function<QAction*(Tool*, QString)> makeAction = [this](Tool* t, QString key) -> QAction* {
+        QAction* action = new QAction(0);
+        action->setCheckable(true);
         action->setText(t->name());
         action->setToolTip(t->toolTip());
         action->setIcon(t->icon());
-        action->setCheckable(true);
-        action->setActionGroup(_toolMenuActionGroup);
         connect(action, &QAction::toggled, [this, key](bool on) {
             if (!on) return;
             if (!_scene) return;
             _scene->setTool(Tool::createInstance(key));
         });
+        connect(_scene, &Scene::destroyed, [action]() {
+           action->setChecked(false);
+        });
+        return action;
+    };
+
+    return createMenu<Tool>(makeAction, "Tool Menu");
+}
+
+QMenu* MainWindow::createManagerMenu()
+{
+    std::function<QAction*(Manager*, QString)> makeAction = [this](Manager* t, QString key) -> QAction* {
+        QAction* action = new QAction(0);
+        action->setText(t->name());
+        action->setToolTip(t->toolTip());
+        action->setIcon(t->icon());
+        connect(action, &QAction::triggered, [this, key]() {
+            Manager* manager = Manager::createInstance(key);
+            addManager(manager);
+            manager->show();
+        });
+        return action;
+    };
+
+    return createMenu<Manager>(makeAction, "Manager Menu");
+}
+
+template<typename T> QMenu* MainWindow::createMenu(std::function<QAction*(T*, QString)> makeAction, QString name)
+{
+    QMenu* menu = new QMenu(name, this);
+
+    QStringList keys = T::types();
+    qSort(keys);
+
+    QActionGroup* group = new QActionGroup(menu);
+    QList<QAction*> actions;
+    for (QString key : keys) {
+        T* t = T::createInstance(key);
+        QAction* action = makeAction(t, key);
         delete t;
+        action->setParent(menu);
+        action->setActionGroup(group);
         actions << action;
     }
-
-    connect(_scene, &Scene::destroyed, [_toolMenuActionGroup]() {
-        for (QAction* a : _toolMenuActionGroup->actions()) {
-            a->setChecked(false);
-        }
-    });
-    _toolMenu->addActions(actions);
+    menu->addActions(actions);
+    return menu;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

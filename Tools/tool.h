@@ -32,6 +32,7 @@ public:
 
     static TOOL_CREATOR_MAP_TYPE* creatorMap() { return _creatorMap; }
     static Tool *createInstance(QString className);
+    static QStringList types() { return creatorMap()->keys(); }
 
 
 private:

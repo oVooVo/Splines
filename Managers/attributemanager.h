@@ -6,18 +6,21 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include "AttributeWidgets/attributewidget.h"
+#include "manager.h"
 
-class AttributeManager : public QWidget
+class AttributeManager : public Manager
 {
     Q_OBJECT
 public:
     explicit AttributeManager(QWidget *parent = 0);
+    void setScene(Scene *s);
 
-    void setSelection(QList<Object*> objects);
 private:
+    void setSelection(QList<Object*> objects);
     QList<QWidget *> getWidgets(QList<Object*> objects);
     QScrollArea* _scrollArea;
     QWidget* _widget = 0;
+    REGISTER_DECL_MANAGAERTYPE(AttributeManager);
 
 };
 

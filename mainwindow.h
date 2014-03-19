@@ -7,6 +7,7 @@
 #include "viewport.h"
 #include "Objects/spline.h"
 #include <QActionGroup>
+#include "Managers/manager.h"
 
 
 namespace Ui {
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void setScene(Scene* scene);
 
 
 public slots:
@@ -31,13 +33,24 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    Scene* _scene;
+    Scene* _scene = 0;
     QString _filepath;
     QString fileDialogDirectory() const;
-    void createToolMenu();
 
+    void addManager(Manager* manager);
+    QList<Manager*> _managers;
+
+    /**
+     * @brief createMenu creates a Menu out of Registered classes
+     * @return
+     */
+    template<typename T> QMenu* createMenu(std::function<QAction*(T*, QString)> makeAction, QString name);
+
+    QMenu* createToolMenu();
     QMenu* _toolMenu = 0;
-    QActionGroup* _toolMenuActionGroup = 0;
+
+    QMenu* createManagerMenu();
+    QMenu* _managerMenu = 0;
 
 };
 
