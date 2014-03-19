@@ -3,6 +3,7 @@
 #include "Spline/bezierpiece.h"
 #include <QDebug>
 #include <QMatrix3x3>
+#include "Attributes/typeattribute.h"
 
 const qreal Spline::EPS = 4.0;
 
@@ -10,6 +11,9 @@ REGISTER_DEFN_OBJECTTYPE(Spline);
 
 Spline::Spline(Object *parent) : Object(parent)
 {
+    QStringList splineTypes;
+    splineTypes << "Linear" << "Cubic" << "B-Spline" << "Bezier";
+    addAttribute("SplineType", new TypeAttribute("Spline type:", splineTypes));
 }
 
 Spline::Spline(QDataStream &stream) : Object(stream)

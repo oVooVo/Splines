@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     AttributeWidgets/attributewidget.cpp \
     Attributes/stringattribute.cpp \
     AttributeWidgets/stringwidget.cpp \
-    testobject.cpp
+    testobject.cpp \
+    Attributes/typeattribute.cpp \
+    AttributeWidgets/typewidget.cpp
 
 HEADERS  += mainwindow.h \
     Objects/spline.h \
@@ -56,8 +58,11 @@ HEADERS  += mainwindow.h \
     AttributeWidgets/attributewidget.h \
     Attributes/stringattribute.h \
     AttributeWidgets/stringwidget.h \
-    testobject.h
+    testobject.h \
+    Attributes/typeattribute.h \
+    AttributeWidgets/typewidget.h
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \
-    AttributeWidgets/stringwidget.ui
+    AttributeWidgets/stringwidget.ui \
+    AttributeWidgets/typewidget.ui

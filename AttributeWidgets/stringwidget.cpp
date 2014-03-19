@@ -11,8 +11,6 @@ StringWidget::StringWidget(QList<Attribute*> attributes) : AttributeWidget(attri
 {
     ui->setupUi(this);
 
-    Q_ASSERT_X(!attributes.isEmpty(), "StringWidget::StringWidget", "attributes must not be empt");
-
     ui->label->setText(((StringAttribute*) attributes.first())->label());
 
 
@@ -31,7 +29,7 @@ void StringWidget::updateView()
     for (Attribute* a : attributes()) {
         StringAttribute* sa = (StringAttribute*) a;
         if (ui->lineEdit->text() != sa->string()) {
-            ui->lineEdit->setText("< multi >");
+            ui->lineEdit->setText(MULTI_LABEL);
             break;
         }
     }

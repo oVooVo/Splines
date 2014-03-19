@@ -10,7 +10,7 @@ class StringWidget : public AttributeWidget
 {
     Q_OBJECT
 public:
-    StringWidget(QList<Attribute*> attributes);
+    explicit StringWidget(QList<Attribute*> attributes);
 
 private slots:
     void updateView();

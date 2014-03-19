@@ -6,6 +6,7 @@
 #include <QWidget>
 
 
+
 class AttributeWidget;
 // convienience define to save typing the type often
 #define ATTRIBUTEWIDGET_CREATOR_MAP_TYPE QMap<QString, AttributeWidget* (*)(QList<Attribute*>&)>
@@ -57,6 +58,8 @@ private:
     //allows to keep _creatorMap private since _creatorMap is an implementation detail.
     template<typename T> friend class AttributeWidgetRegister;
 
+protected:
+    static const QString MULTI_LABEL;
 };
 
 /**
@@ -75,6 +78,7 @@ struct AttributeWidgetRegister
         AttributeWidget::_creatorMap->insert(className, &createAttributeWidget<T>);
     }
 };
+
 
 #define REGISTER_DECL_ATTRIBUTEWIDGETTYPE(CLASSNAME) \
     static AttributeWidgetRegister<CLASSNAME> reg

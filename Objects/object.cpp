@@ -13,7 +13,8 @@ OBJECT_CREATOR_MAP_TYPE *Object::_creatorMap = 0;
 
 Object::Object(Object *parent) : QObject(parent)
 {
-    initAttributes();
+    addAttribute("TransformationAttribute", new TransformationAttribute());
+    addAttribute("NameAttribute", new StringAttribute("Name:", genericName()));
 }
 
 Object::Object(QDataStream &stream)
@@ -57,13 +58,6 @@ Object* Object::deserialize(QDataStream &stream)
     }
     return object;
 }
-
-void Object::initAttributes()
-{
-    addAttribute("TransformationAttribute", new TransformationAttribute());
-    addAttribute("NameAttribute", new StringAttribute("Name:", genericName()));
-}
-
 
 Object::~Object()
 {

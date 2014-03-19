@@ -234,12 +234,6 @@ protected:
      */
     void addAttribute(QString key, Attribute* a);
 
-    /**
-     * @brief initAttributes initialize Attributes. This Method defines which attributes this Object has. Please use this methode
-     *  only in non-stream constructor
-     */
-    virtual void initAttributes();
-
 private:
     /**
      * @brief _attributes stores the attributes

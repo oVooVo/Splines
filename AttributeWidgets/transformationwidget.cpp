@@ -13,9 +13,6 @@ TransformationWidget::TransformationWidget(QList<Attribute *> attributes) :
     ui->setupUi(this);
 
     for (Attribute* a : attributes) {
-        Q_ASSERT_X(a->inherits(TransformationAttribute::staticMetaObject.className()), "TransformationWidget::TransformationWidget",
-                   "Trying to create TransformationWidget from non TransformationAttribute");
-
         TransformationAttribute* ta = (TransformationAttribute*) a;
         connect(ui->doubleSpinBoxR,  SIGNAL(valueChanged(double)), ta, SLOT(setR(double)));
         connect(ui->doubleSpinBoxX,  SIGNAL(valueChanged(double)), ta, SLOT(setX(double)));
@@ -51,7 +48,7 @@ void TransformationWidget::updateView()
         spinbox(key)->setValue(v);
         for (Attribute* a : attributes()) {
             if (!qFuzzyCompare(((TransformationAttribute*) a)->value(key), v)) {
-                spinbox(key)->setSpecialValueText("< multi >");
+                spinbox(key)->setSpecialValueText(MULTI_LABEL);
                 spinbox(key)->setValue(spinbox(key)->minimum());
                 break;
             }
