@@ -29,7 +29,6 @@ public slots:
     bool saveAs();
     bool load();
     bool newScene();
-    bool close();
 
 private:
     bool _isSaved;
@@ -45,7 +44,7 @@ private:
     QString fileDialogDirectory() const;
     void updateWindowTitle();
 
-    void addManager(Manager* manager);
+    void addManager(Manager* manager, bool floating = true);
 
     /**
      * @brief createMenu creates a Menu out of Registered classes

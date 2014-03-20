@@ -28,6 +28,17 @@ MainWindow::MainWindow(QWidget *parent) :
     updateWindowTitle();
 
     newScene();
+
+    Manager* m;
+    m = new ObjectManager(this);
+    addManager(m, false);
+    addDockWidget(Qt::RightDockWidgetArea, m);
+    m->setScene(_scene);
+
+    m = new AttributeManager(this);
+    addManager(m, false);
+    addDockWidget(Qt::RightDockWidgetArea, m);
+    m->setScene(_scene);
 }
 
 MainWindow::~MainWindow()
@@ -141,12 +152,12 @@ void MainWindow::setScene(Scene *scene)
     }
 }
 
-void MainWindow::addManager(Manager *manager)
+void MainWindow::addManager(Manager *manager, bool floating)
 {
     if (_scene) {
         manager->setScene(_scene);
         manager->setParent(this);
-        manager->setFloating(true);
+        manager->setFloating(floating);
         manager->show();
     } else {
         delete manager;
@@ -266,9 +277,18 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 }
 
-bool MainWindow::close()
-{
-    return QMainWindow::close();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
