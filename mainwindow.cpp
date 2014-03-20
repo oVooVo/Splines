@@ -3,26 +3,29 @@
 #include <QFileDialog>
 #include <QDebug>
 #include "Tools/tool.h"
+#include <Managers/objectmanager.h>
+#include <Managers/attributemanager.h>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setScene(new Scene());
-
-    connect(ui->actionSpeichern, SIGNAL(triggered()), this, SLOT(save()));
-    connect(ui->actionSpeichern_unter, SIGNAL(triggered()), this, SLOT(saveAs()));
-    connect(ui->action_ffnen, SIGNAL(triggered()), this, SLOT(load()));
-
-
-    connect(ui->actionNewSpline, &QAction::triggered, [this]() { _scene->addObject(new Spline()); });
-
+    installEventFilter(this);
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(save()));
+    connect(ui->actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(load()));
+    connect(ui->actionNewScene, SIGNAL(triggered()), this, SLOT(newScene()));
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
     menuBar()->addMenu(createToolMenu());
     menuBar()->addMenu(createManagerMenu());
     menuBar()->addMenu(createNewObjectsMenu());
+    updateWindowTitle();
 
+    newScene();
 }
 
 MainWindow::~MainWindow()
@@ -30,23 +33,25 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addSpline()
-{
-    _scene->addObject(new Object());
-}
-
-void MainWindow::save()
+bool MainWindow::save()
 {
     if (_filepath.isEmpty()) {
         saveAs();
-        return;
     }
 
     QFile file(_filepath);
     file.open(QIODevice::ReadWrite);
+
+    if (!file.isWritable())
+        return false;
+
     QDataStream stream(&file);
     stream << _scene;
     file.close();
+
+    _isSaved = true;
+    updateWindowTitle();
+    return true;
 }
 
 QString MainWindow::fileDialogDirectory() const
@@ -54,24 +59,52 @@ QString MainWindow::fileDialogDirectory() const
     return _filepath.isEmpty() ? QDir::home().absolutePath() : _filepath;
 }
 
-void MainWindow::saveAs()
+bool MainWindow::saveAs()
 {
     _filepath = QFileDialog::getSaveFileName(this, "Save Project", fileDialogDirectory());
-    if (!_filepath.isEmpty())
-        save();
+    if (!_filepath.isEmpty()) {
+        return save();
+    } else {
+        return false;
+    }
 }
 
-void MainWindow::load()
+bool MainWindow::newScene()
 {
+    if (!canDiscard()) return false;
+
+    setScene(new Scene());
+
+    return true;
+}
+
+bool MainWindow::load()
+{
+    if (!canDiscard()) return false;
+
     _filepath = QFileDialog::getOpenFileName(this, "Open Project", fileDialogDirectory());
-    if (_filepath.isEmpty()) return;
+    if (_filepath.isEmpty()) return false;
 
     QFile file(_filepath);
     file.open(QIODevice::ReadWrite);
+
+    if (!file.isReadable())
+        return false;
+
     QDataStream stream(&file);
     Scene* scene;
     stream >> scene;
-    setScene(scene);
+
+    if (scene) {
+        setScene(scene);
+        return true;
+    } else {
+        QMessageBox::warning(this,
+                             "Error",
+                             QString("Failed loading file %1").arg(_filepath),
+                             QMessageBox::Ok, QMessageBox::Ok);
+        return false;
+    }
 
 }
 
@@ -87,6 +120,22 @@ void MainWindow::setScene(Scene *scene)
 
     _scene = scene;
 
+    if (_scene) {
+        connect(_scene, &Scene::changed, [this](){
+            if (!_isSaved) return;
+
+            _isSaved = false;
+            updateWindowTitle();
+        });
+
+        connect(_scene, &Scene::destroyed, [this]() {
+            for (QAction* a : _checkableActions)
+                a->setChecked(false);
+        });
+
+        _isSaved = true;
+        updateWindowTitle();
+    }
 }
 
 void MainWindow::addManager(Manager *manager)
@@ -147,20 +196,20 @@ template<typename T> QMenu* MainWindow::createMenu(CONNECT_ACTION_TYPE connectAc
     QActionGroup* group = new QActionGroup(menu);
     QList<QAction*> actions;
     for (QString classname : classnames) {
-        T* t = T::createInstance(classname);
+        Action* t = T::createInstance(classname);
         if (t->makeAction()) {
             QAction* action = new QAction(menu);
             connectAction(classname, action);
             action->setParent(menu);
-            action->setActionGroup(group);
+            if (!t->isCommand()) {
+                action->setActionGroup(group);
+                action->setCheckable(true);
+            }
             action->setText(t->actionText());
             action->setToolTip(t->toolTip());
             action->setIcon(t->icon());
-            action->setCheckable(t->isCheckable());
             if (action->isCheckable()) {
-                connect(_scene, &Scene::destroyed, [action]() {
-                    action->setChecked(false);
-                });
+                _checkableActions << action;
             }
             actions << action;
         }
@@ -170,32 +219,45 @@ template<typename T> QMenu* MainWindow::createMenu(CONNECT_ACTION_TYPE connectAc
     return menu;
 }
 
+void MainWindow::updateWindowTitle()
+{
+    QString filename = tr("New File");
 
+    if (!_filepath.isEmpty()) {
+        QFileInfo fileInfo = QFileInfo(_filepath);
+        filename = fileInfo.fileName();
+    }
+    if (!_isSaved)
+        filename.append(" *");
+    setWindowTitle(filename);
+}
 
+bool MainWindow::canDiscard()
+{
+    if (_isSaved) return true;
 
+    QMessageBox::StandardButton ans = QMessageBox::question(this, tr("Discard?"), tr("There are unsaved changes. Do you want to save?"),
+                                                            QMessageBox::Save | QMessageBox::Abort | QMessageBox::Discard,
+                                                            QMessageBox::Save);
+    switch (ans) {
+    case QMessageBox::Save:
+        return save();
+    case QMessageBox::Abort:
+        return false;
+    case QMessageBox::Discard:
+        return true;
+    default:
+        return true;
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    if (canDiscard()) {
+        e->accept();
+    } else {
+        e->ignore();
+    }
+}
 
 

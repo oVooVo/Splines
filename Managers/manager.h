@@ -21,7 +21,7 @@ public:
     virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
-    bool isCheckable() const { return false; }
+    bool isCommand() const { return true; } // add new Manager is a command
 
 private:
     Scene* _scene = 0;

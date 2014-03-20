@@ -35,22 +35,17 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuDatei">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Datei</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionSpeichern"/>
-    <addaction name="actionSpeichern_unter"/>
-    <addaction name="action_ffnen"/>
+    <addaction name="actionNewScene"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuObjekte">
-    <property name="title">
-     <string>Objekte</string>
-    </property>
-    <addaction name="actionNewSpline"/>
-   </widget>
-   <addaction name="menuDatei"/>
-   <addaction name="menuObjekte"/>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNewSpline">
@@ -61,19 +56,44 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSpeichern">
+  <action name="actionSave">
    <property name="text">
-    <string>Speichern</string>
+    <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSpeichern_unter">
+  <action name="actionSaveAs">
    <property name="text">
-    <string>Speichern unter ...</string>
+    <string>Save &amp;as ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="action_ffnen">
+  <action name="actionOpen">
    <property name="text">
-    <string>Öffnen</string>
+    <string>&amp;Open ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionNewScene">
+   <property name="text">
+    <string>&amp;New Scene</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

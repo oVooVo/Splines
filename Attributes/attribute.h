@@ -6,6 +6,8 @@
 #include <QMap>
 
 
+//TODO register_defines.h!
+
 class Attribute;
 // convienience define to save typing the type often
 #define ATTRIBUTE_CREATOR_MAP_TYPE QMap<QString, Attribute* (*)(QDataStream&)>

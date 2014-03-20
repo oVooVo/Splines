@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QApplication::setApplicationName("Oyolo");
+    QApplication::setApplicationDisplayName("Oyolo");
+
 #ifdef TEST
     UnitTester *tester = new UnitTester();
     delete tester;

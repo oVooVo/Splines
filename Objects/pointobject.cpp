@@ -34,6 +34,44 @@ void PointObject::addPoint(Point* p)
     emit changed();
 }
 
+void PointObject::selectAll()
+{
+    if (_selected.size() == _points.size()) return;
+    blockSignals(true);
+    for (Point* p : points()) {
+        select(p);
+    }
+    blockSignals(false);
+    emit changed();
+}
+
+void PointObject::deselectAll()
+{
+    if (_selected.isEmpty()) return;
+    blockSignals(true);
+    for (Point* p : points()) {
+        deselect(p);
+    }
+    blockSignals(false);
+    emit changed();
+}
+
+void PointObject::select(Point* p)
+{
+    if (p->isSelected()) return;
+    p->select();
+    _selected.append(p);
+    emit changed();
+}
+
+void PointObject::deselect(Point* p)
+{
+    if (!p->isSelected()) return;
+    p->deselect();
+    _selected.removeOne(p);
+    emit changed();
+}
+
 
 /*
 void PointObject::handleSelection(Point *p, bool extended)

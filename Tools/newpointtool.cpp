@@ -9,15 +9,17 @@ NewPointTool::NewPointTool()
 {
 }
 
-void NewPointTool::perform(Object *o)
+bool NewPointTool::canPerform(const Object *o) const
 {
-    if (interaction().click() == Interaction::SingleClick
+    return interaction().click() == Interaction::SingleClick
             && interaction().button() == Qt::LeftButton
             && interaction().type() == Interaction::Press
             && interaction().modifiers() == Qt::NoModifier
-            && o->inherits(CLASSNAME(PointObject))) {
+            && o->inherits(CLASSNAME(PointObject));
+}
 
-        PointObject* p = (PointObject*) o;
-        p->addPoint(new Point(o->map(interaction().point())));
-    }
+void NewPointTool::_perform_(Object *o)
+{
+    PointObject* p = (PointObject*) o;
+    p->addPoint(new Point(o->map(interaction().point())));
 }

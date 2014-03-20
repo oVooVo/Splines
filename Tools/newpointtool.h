@@ -3,19 +3,22 @@
 
 #include "tool.h"
 
-#define CLASSNAME(T) T::staticMetaObject.className()
-
 class NewPointTool : public Tool
 {
     Q_OBJECT
 public:
     NewPointTool();
-    void perform(Object *o);
+    bool isCommand() const { return false; }
+    QString actionText() const { return tr("Add Point"); }
+
+protected:
+    void _perform_(Object *o);
+    bool canPerform(const Object *o) const;
 
 private:
     QPointF _pos;
-    REGISTER_DECL_TYPE(Tool, NewPointTool);
 
+    REGISTER_DECL_TYPE(Tool, NewPointTool);
 };
 
 #endif // NEWPOINTTOOL_H

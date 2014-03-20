@@ -12,6 +12,8 @@ class Action
 {
 protected:
     Action() {}
+public:
+    virtual ~Action() {}
 
 public:
     /**
@@ -33,10 +35,11 @@ public:
     virtual QIcon icon() const = 0;
 
     /**
-     * @brief isCheckable returns whether this action checkable
-     * @return whether this action is checkable
+     * @brief isCommand returns whether this action is a command. Commands are performed when they are activated.
+     *  In contrast to commands there are tools that can be activated but are perfomed interactively.
+     * @return whether this action is is a command
      */
-    virtual bool isCheckable() const = 0;
+    virtual bool isCommand() const = 0;
 
     /**
      * @brief makeAction returns whether an action should be created from this object

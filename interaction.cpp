@@ -1,5 +1,7 @@
 #include "interaction.h"
 
+const Interaction Interaction::NoInteraction = Interaction();
+
 Interaction::Interaction(Qt::MouseButton button, QPointF pos, Click click, Qt::KeyboardModifiers modifiers)
 {
     _button = button;

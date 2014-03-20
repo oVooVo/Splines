@@ -7,7 +7,11 @@
 #include "action.h"
 #include "register_defines.h"
 
+#define CLASSNAME(CLASS) CLASS::staticMetaObject.className()
 
+/**
+ * @brief The Tool class
+ */
 class Tool : public QObject, public Action
 {
     Q_OBJECT
@@ -15,15 +19,19 @@ class Tool : public QObject, public Action
 public:
     Tool();
 
-    virtual void perform(Object* o) = 0;
-    void config(Interaction& interaction);
+    void perform(Object* o);
+
+    void config(const Interaction &interaction);
 
     Interaction interaction() const { return _interaction; }
 
     virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
-    bool isCheckable() const { return true; }
+
+protected:
+    virtual bool canPerform(const Object* o) const = 0;
+    virtual void _perform_(Object* o) = 0;
 
 private:
     Interaction _interaction;

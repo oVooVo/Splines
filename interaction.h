@@ -17,6 +17,8 @@ public:
     Interaction(Qt::MouseButton button, Click click, Qt::KeyboardModifiers modifiers, QPointF q, Type type);
     Interaction() {}
 
+    static const Interaction NoInteraction;
+
 public:
     // map them to what ever you want :)
     Click click() const {

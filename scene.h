@@ -81,7 +81,7 @@ private:
     // interaction
     //-------------
 public:
-    void processInteraction(Interaction& interaction);
+    void processInteraction(const Interaction &interaction);
     void setTool(Tool* tool = 0);
 private:
     Tool* _tool = 0;
@@ -97,9 +97,13 @@ private:
     QItemSelectionModel* _selectionModel = 0;
 
 
-protected:
+private:
+    static void serializeHeader(QDataStream &out);
+    static bool deserializeHeader(QDataStream &in);
     friend QDataStream& operator<<(QDataStream& out, const Scene* s);
     friend QDataStream& operator>>(QDataStream& in, Scene* &s);
+
+
 
 
 };

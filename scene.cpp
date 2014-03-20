@@ -261,7 +261,7 @@ QList<Object*> Scene::selectedObjects() const
     return list;
 }
 
-void Scene::processInteraction(Interaction &interaction)
+void Scene::processInteraction(const Interaction &interaction)
 {
     if (!_tool) return;
 
@@ -274,13 +274,53 @@ void Scene::processInteraction(Interaction &interaction)
 
 void Scene::setTool(Tool *tool)
 {
-    if (_tool) delete _tool;
-    _tool = tool;
+    if (!tool->isCommand()) {
+        // if tool is a tool that can be choosen and performed iteractively
+        if (_tool)
+            delete _tool;
+        _tool = tool;
+    } else {
+        // if tool is a command that is performed only once
+        Tool* oldTool = _tool;
+        _tool = tool;
+        processInteraction(Interaction::NoInteraction);
+        delete _tool;
+        _tool = oldTool;
+    }
 }
 
+QString magic()
+{
+    return "OYOLO";
+}
+
+quint64 version()
+{
+    return 1000;
+}
+
+void Scene::serializeHeader(QDataStream &out)
+{
+    out << magic();
+    out << (quint64) 1000; //version
+}
+
+bool Scene::deserializeHeader(QDataStream &in)
+{
+    QString m;
+    in >> m;
+    if (m != magic()) return false;
+
+    quint64 v;
+    in >> v;
+    if (v != version()) return false;
+
+    return true;
+}
 
 QDataStream& operator<<(QDataStream& out, const Scene* s)
 {
+    Scene::serializeHeader(out);
     out << s->root();
     out << s->_freeIds << s->_objectCounter;
     return out;
@@ -288,11 +328,15 @@ QDataStream& operator<<(QDataStream& out, const Scene* s)
 
 QDataStream& operator>>(QDataStream& in, Scene* &s)
 {
-    Object* root;
-    in >> root;
-    Q_ASSERT_X(QString(root->metaObject()->className()) == "Root", "Scene operator>>", "root is not of type Root");
-    s = new Scene((Root*) root);
-    in >> s->_freeIds >> s->_objectCounter;
+    if (!Scene::deserializeHeader(in)) {
+        s = 0;
+    } else {
+        Object* root;
+        in >> root;
+        Q_ASSERT_X(QString(root->metaObject()->className()) == "Root", "Scene operator>>", "root is not of type Root");
+        s = new Scene((Root*) root);
+        in >> s->_freeIds >> s->_objectCounter;
+    }
     return in;
 }
 

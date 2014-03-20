@@ -278,14 +278,14 @@ public:
 
     //------------------------------
     //
-    // To generate menu entries
+    // To generate menu entries that create a new object on click
     //
     //------------------------------
 public:
     virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
-    bool isCheckable() const { return false; }
+    bool isCommand() const { return true; }    // the "new Object Tool" is a command
 
 
 

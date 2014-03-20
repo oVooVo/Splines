@@ -6,7 +6,13 @@ Tool::Tool()
 {
 }
 
-void Tool::config(Interaction &interaction)
+void Tool::config(const Interaction &interaction)
 {
     _interaction = interaction;
+}
+
+void Tool::perform(Object *o)
+{
+    if (canPerform(o))
+        _perform_(o);
 }

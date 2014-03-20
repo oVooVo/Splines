@@ -19,6 +19,12 @@ protected:
     virtual void serialize(QDataStream &stream) const;
     virtual void deserialize(QDataStream &stream);
 
+public:
+    void selectAll();
+    void deselectAll();
+    void select(Point* p);
+    void deselect(Point* p);
+
 private:
     QList<Point*> _points;
     QList<Point*> _selected;

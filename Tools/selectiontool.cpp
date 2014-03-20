@@ -6,7 +6,12 @@ SelectionTool::SelectionTool()
 {
 }
 
-void SelectionTool::perform(Object *o)
+bool SelectionTool::canPerform(const Object *o) const
+{
+    return o->inherits(CLASSNAME(PointObject));
+}
+
+void SelectionTool::_perform_(Object *o)
 {
     Q_UNUSED(o);
 }
