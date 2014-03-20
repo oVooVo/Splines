@@ -86,6 +86,15 @@ void PointObject::deselect(Point* p)
     emit changed();
 }
 
+void PointObject::toggleSelection(Point *p)
+{
+    if (p->isSelected())
+        select(p);
+    else
+        deselect(p);
+    emit changed();
+}
+
 
 /*
 void PointObject::handleSelection(Point *p, bool extended)

@@ -25,6 +25,7 @@ public:
     void deselectAll();
     void select(Point* p);
     void deselect(Point* p);
+    void toggleSelection(Point* p);
     Point* pointAt(QPointF pos) const;
 
 private:

@@ -23,18 +23,17 @@ void SelectionTool::_perform_(Object *o)
     Point* p = pointObject->pointAt(interaction(o).point());
 
     if (interaction().type() == Interaction::Press) {
-        if (interaction().modifiers() != Qt::SHIFT) {
+        if (interaction().modifiers() != Qt::SHIFT)
             pointObject->deselectAll();
-        }
-        if (!p) return;
-        if (p->isSelected()) {
-            pointObject->deselect(p);
-        } else {
+        if (p && !p->isSelected()) {
             pointObject->select(p);
         }
+    } else if (interaction().type() == Interaction::Release) {
+
     } else if (interaction().type() == Interaction::Move) {
         for (Point* point : pointObject->selection()) {
             point->move(interaction(o).point());
+            _justSelectedOrMoved = true;
         }
         if (!pointObject->selection().isEmpty())
             pointObject->emitChanged();
