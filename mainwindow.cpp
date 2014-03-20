@@ -87,6 +87,9 @@ bool MainWindow::newScene()
     if (!canDiscard()) return false;
 
     setScene(new Scene());
+    _filepath = "";
+
+    updateWindowTitle();
 
     return true;
 }
