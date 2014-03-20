@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QMimeData>
 #include "Tools/newpointtool.h"
+#include "Managers/manager.h"
 
 QList<QModelIndex> Scene::_draggedObjects;
 
@@ -12,6 +13,9 @@ Scene::Scene(Root *root)
     _root = root;
     connect(_root, SIGNAL(changed()), this, SIGNAL(changed()));
     _selectionModel = new QItemSelectionModel(this);
+    connect(selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(on_selectionChanged()));
+    connect(this, SIGNAL(changed()), this, SLOT(on_sceneChanged()));
 }
 
 Scene::~Scene()
@@ -340,5 +344,32 @@ QDataStream& operator>>(QDataStream& in, Scene* &s)
     return in;
 }
 
+void Scene::addManager(Manager *m)
+{
+    if (_managers.contains(m)) return;
+
+    _managers.append(m);
+}
+
+void Scene::removeManager(Manager *m)
+{
+    if (!_managers.contains(m)) return;
+
+    _managers.removeOne(m);
+}
+
+void Scene::on_sceneChanged()
+{
+    for (Manager* m : _managers) {
+        m->sceneChanged();
+    }
+}
+
+void Scene::on_selectionChanged()
+{
+    for (Manager* m : _managers) {
+        m->selectionChanged();
+    }
+}
 
 

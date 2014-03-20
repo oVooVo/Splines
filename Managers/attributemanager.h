@@ -13,7 +13,8 @@ class AttributeManager : public Manager
     Q_OBJECT
 public:
     explicit AttributeManager(QWidget *parent = 0);
-    void setScene(Scene *s);
+
+    void selectionChanged();
 
 private:
     void setSelection(QList<Object*> objects);

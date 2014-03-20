@@ -13,6 +13,7 @@ class Manager : public QDockWidget, public Action
     DECL_MEMBER(Manager)
 public:
     Manager(QWidget* parent = 0);
+    virtual ~Manager();
 
 public:
     Scene* scene() const { return _scene; }
@@ -22,6 +23,12 @@ public:
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
     bool isCommand() const { return true; } // add new Manager is a command
+
+    virtual void selectionChanged() {}
+    virtual void sceneChanged() {}
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private:
     Scene* _scene = 0;

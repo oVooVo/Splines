@@ -72,13 +72,8 @@ QList<QWidget*> AttributeManager::getWidgets(QList<Object *> objects)
     return attributeWidgets;
 }
 
-void AttributeManager::setScene(Scene *s)
+void AttributeManager::selectionChanged()
 {
-    Manager::setScene(s);
-    if (scene()) {
-        connect(scene()->selectionModel(), &QItemSelectionModel::selectionChanged, [this]() {
-            setSelection(scene()->selectedObjects());
-        });
-        setSelection(scene()->selectedObjects());
-    }
+    qDebug() << "selection changed";
+    setSelection(scene()->selectedObjects());
 }

@@ -14,6 +14,8 @@ public:
     Scene* model() const { return (Scene*) _treeView->model(); }
     void setScene(Scene *scene);
 
+    void selectionChanged();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
 

@@ -7,6 +7,8 @@
 #include <Managers/attributemanager.h>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QSettings>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,8 +37,8 @@ MainWindow::~MainWindow()
 
 bool MainWindow::save()
 {
-    if (_filepath.isEmpty()) {
-        saveAs();
+    if (_filepath.isEmpty() && !saveAs()) {
+        return false;
     }
 
     QFile file(_filepath);
@@ -111,12 +113,13 @@ bool MainWindow::load()
 void MainWindow::setScene(Scene *scene)
 {
     ui->viewport->setScene(scene); //TODO: viewport should be a manager too! (but no QDockWidget...)
-    for (Manager* manager : _managers) {
-        manager->setScene(scene);
-    }
 
-    if (_scene)
+    if (_scene) {
+        for (Manager* manager : _scene->managers()) {
+            manager->setScene(scene);
+        }
         delete _scene;  //all connections that target _scene were destroyed :)
+    }
 
     _scene = scene;
 
@@ -140,8 +143,14 @@ void MainWindow::setScene(Scene *scene)
 
 void MainWindow::addManager(Manager *manager)
 {
-    manager->setScene(_scene);
-    _managers.append(manager);
+    if (_scene) {
+        manager->setScene(_scene);
+        manager->setParent(this);
+        manager->setFloating(true);
+        manager->show();
+    } else {
+        delete manager;
+    }
 }
 
 QMenu* MainWindow::createToolMenu()
@@ -164,9 +173,6 @@ QMenu* MainWindow::createManagerMenu()
         connect(action, &QAction::triggered, [this, classname]() {
             Manager* manager = Manager::createInstance(classname);
             addManager(manager);
-            manager->setParent(this);
-            manager->setFloating(true);
-            manager->show();
         });
     };
 
@@ -258,6 +264,11 @@ void MainWindow::closeEvent(QCloseEvent *e)
     } else {
         e->ignore();
     }
+}
+
+bool MainWindow::close()
+{
+    return QMainWindow::close();
 }
 
 

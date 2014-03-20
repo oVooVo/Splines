@@ -12,6 +12,7 @@
 #include "interaction.h"
 #include "Tools/tool.h"
 
+class Manager;
 class Scene : public QAbstractItemModel
 {
     Q_OBJECT
@@ -41,6 +42,7 @@ public:
     void draw(QPainter &painter);
 signals:
     void changed();
+    void selectionChanged();
 
     //------------
     // Tree Model
@@ -95,6 +97,21 @@ public:
     QList<Object*> selectedObjects() const;
 private:
     QItemSelectionModel* _selectionModel = 0;
+
+    //-------------------------
+    //
+    // Manager
+    //
+    //------------------------
+public:
+    void addManager(Manager* m);
+    void removeManager(Manager* m);
+    QList<Manager*> managers() const { return _managers; }
+private:
+    QList<Manager*> _managers;
+private slots:
+    void on_selectionChanged();
+    void on_sceneChanged();
 
 
 private:

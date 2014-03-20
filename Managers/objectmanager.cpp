@@ -38,14 +38,17 @@ void ObjectManager::deleteSelected()
     }
 }
 
-void ObjectManager::setScene(Scene *s)
+void ObjectManager::selectionChanged()
 {
-    Manager::setScene(s);
-    _treeView->setModel(s);
-    if (s) {
-        _treeView->setSelectionModel(s->selectionModel());
-        connect(s->selectionModel(), &QItemSelectionModel::selectionChanged, [this](){
-            _treeView->dataChanged(QModelIndex(), QModelIndex());
-        });
+    if (scene()) {
+        _treeView->dataChanged(QModelIndex(), QModelIndex());
     }
+}
+
+void ObjectManager::setScene(Scene *scene)
+{
+    _treeView->setModel(scene);
+    if (scene)
+        _treeView->setSelectionModel(scene->selectionModel());
+    Manager::setScene(scene);
 }

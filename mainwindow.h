@@ -29,6 +29,7 @@ public slots:
     bool saveAs();
     bool load();
     bool newScene();
+    bool close();
 
 private:
     bool _isSaved;
@@ -45,7 +46,6 @@ private:
     void updateWindowTitle();
 
     void addManager(Manager* manager);
-    QList<Manager*> _managers;
 
     /**
      * @brief createMenu creates a Menu out of Registered classes
