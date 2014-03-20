@@ -10,7 +10,7 @@ class SelectAllTool : public Tool
     Q_OBJECT
 public:
     SelectAllTool();
-    QString actionText() const { return tr("Select All Points"); }
+    QString actionText() const { return tr("Select all points"); }
     bool isCommand() const { return true; }
 
 

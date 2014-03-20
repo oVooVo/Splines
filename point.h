@@ -22,6 +22,7 @@ public:
     void select() { _select = true; }
     void deselect() { _select = false; }
     bool isSelected() const { return _select; }
+    void move(QPointF t);
 
 private:
     QPointF _left;

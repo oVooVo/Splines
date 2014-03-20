@@ -13,9 +13,10 @@ public:
 
     virtual void addPoint(Point* p);
 
-protected:
     QList<Point*> points() const { return _points; }
     QList<Point*> selection() const { return _selected; }
+
+protected:
     virtual void serialize(QDataStream &stream) const;
     virtual void deserialize(QDataStream &stream);
 

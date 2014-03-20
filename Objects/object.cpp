@@ -272,6 +272,11 @@ QList<quint64> Object::idsOfAllDescendants() const
     return list;
 }
 
+void Object::emitChanged()
+{
+    emit changed();
+}
+
 QDataStream& operator<<(QDataStream& stream, const Object* o)
 {
     stream << QString(o->metaObject()->className());

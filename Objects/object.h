@@ -276,6 +276,7 @@ public:
     QPointF map(QPointF pos, bool translate = true) const;
 
 
+
     //------------------------------
     //
     // To generate menu entries that create a new object on click
@@ -291,6 +292,8 @@ public:
 
 signals:
     void changed();
+public:
+    void emitChanged();
 };
 
 REGISTERER(Object)

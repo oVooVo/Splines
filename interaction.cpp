@@ -1,4 +1,5 @@
 #include "interaction.h"
+#include <QDebug>
 
 const Interaction Interaction::NoInteraction = Interaction();
 
@@ -31,7 +32,7 @@ Interaction Interaction::mapCopy(QTransform t) const
 void Interaction::map(QTransform t)
 {
     QTransform trans = (type() == Move ?
-                            QTransform(t.m11(), t.m12(), 0, t.m21(), t.m22(), 0, 0, 1) :
+                            QTransform(t.m11(), t.m12(), 0, t.m21(), t.m22(), 0, 0, 0, 1) :
                             t  );
     _point = trans.map(_point);
 }

@@ -20,7 +20,7 @@ void Tool::perform(Object *o)
 Interaction Tool::interaction(Object *o) const
 {
     if (o) {
-        return _interaction.mapCopy(o->globalTransform());
+        return _interaction.mapCopy(o->globalTransform().inverted());
     } else {
         return _interaction;
     }

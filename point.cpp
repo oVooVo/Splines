@@ -32,6 +32,11 @@ void Point::draw(QPainter &painter)
     painter.restore();
 }
 
+void Point::move(QPointF t)
+{
+    _point += t;
+}
+
 QDataStream& operator<<(QDataStream& out, const Point* s)
 {
     out << s->_point << s->_left << s->_right << (quint8) s->_select << (quint8) s->_showTangents;
