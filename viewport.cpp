@@ -44,7 +44,7 @@ void Viewport::mousePressEvent(QMouseEvent *event)
     QPointF pos = map(event->pos());
     _lastMousePos = pos;
 
-    Interaction interaction(event->button(), pos, Interaction::SingleClick, event->modifiers());
+    Interaction interaction(event->button(), pos, Interaction::Press, Interaction::SingleClick, event->modifiers());
     if (_scene) _scene->processInteraction(interaction);
 }
 
@@ -62,7 +62,7 @@ void Viewport::mouseDoubleClickEvent(QMouseEvent *event)
     QPointF pos = map(event->pos());
     _lastMousePos = pos;
 
-    Interaction interaction(event->button(), pos, Interaction::DoubleClick, event->modifiers());
+    Interaction interaction(event->button(), pos, Interaction::Press, Interaction::DoubleClick, event->modifiers());
     if (_scene) _scene->processInteraction(interaction);
 }
 
@@ -71,7 +71,7 @@ void Viewport::mouseReleaseEvent(QMouseEvent *event)
     QPointF pos = map(event->pos());
     _lastMousePos = pos;
 
-    Interaction interaction(event->button(), pos, Interaction::DoubleClick, event->modifiers());
+    Interaction interaction(event->button(), pos, Interaction::Release, Interaction::NoClick, event->modifiers());
     if (_scene) _scene->processInteraction(interaction);
 }
 

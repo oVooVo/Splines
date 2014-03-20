@@ -2,37 +2,30 @@
 
 const Interaction Interaction::NoInteraction = Interaction();
 
-Interaction::Interaction(Qt::MouseButton button, QPointF pos, Click click, Qt::KeyboardModifiers modifiers)
+Interaction::Interaction(Qt::MouseButton button, QPointF pos, Type type, Click click, Qt::KeyboardModifiers modifiers)
 {
     _button = button;
+    _point = pos;
+    _type = type;
+    Q_ASSERT(type != Move);
     _click = click;
     _modifiers = modifiers;
-    _point = pos;
-    _type = Press;
 }
 
 Interaction::Interaction(QPointF t, Qt::KeyboardModifiers modifiers)
 {
+    _button = Qt::NoButton;
     _point = t;
-    _modifiers = modifiers;
     _type = Move;
+    _click = NoClick;
+    _modifiers = modifiers;
 }
 
-Interaction::Interaction(Qt::MouseButton button, QPointF pos, Qt::KeyboardModifiers modifiers)
+Interaction Interaction::mapCopy(QTransform t) const
 {
-    _point = pos;
-    _button = button;
-    _modifiers = modifiers;
-    _type = Release;
-}
-
-Interaction::Interaction(Qt::MouseButton button, Click click, Qt::KeyboardModifiers modifiers, QPointF q, Type type)
-{
-    _button = button;
-    _point = q;
-    _click = click;
-    _modifiers = modifiers;
-    _type = type;
+    Interaction m = (*this);
+    m.map(t);
+    return m;
 }
 
 void Interaction::map(QTransform t)

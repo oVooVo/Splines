@@ -1,5 +1,6 @@
 #include "selectalltool.h"
 #include "Objects/pointobject.h"
+#include <QDebug>
 
 REGISTER_DEFN_TYPE(Tool, SelectAllTool);
 

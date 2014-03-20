@@ -11,10 +11,8 @@ public:
     enum Click       { NoClick, SingleClick, DoubleClick };
     enum Type        { Release, Move, Press, Invalid     };
 
-    Interaction(Qt::MouseButton button, QPointF pos, Click click = SingleClick, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+    Interaction(Qt::MouseButton button, QPointF pos, Type type, Click click = SingleClick, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
     Interaction(QPointF t, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
-    Interaction(Qt::MouseButton button, QPointF pos, Qt::KeyboardModifiers modifiers);
-    Interaction(Qt::MouseButton button, Click click, Qt::KeyboardModifiers modifiers, QPointF q, Type type);
     Interaction() {}
 
     static const Interaction NoInteraction;
@@ -44,6 +42,9 @@ public:
 
     //map translation into other coordinate system
     void map(QTransform t);
+
+    //return copy of this with mapped transformation
+    Interaction mapCopy(QTransform t) const;
 
 private:
     Click                 _click     = NoClick;

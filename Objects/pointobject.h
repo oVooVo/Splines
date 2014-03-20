@@ -24,6 +24,7 @@ public:
     void deselectAll();
     void select(Point* p);
     void deselect(Point* p);
+    Point* pointAt(QPointF pos) const;
 
 private:
     QList<Point*> _points;

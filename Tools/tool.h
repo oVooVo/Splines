@@ -23,7 +23,7 @@ public:
 
     void config(const Interaction &interaction);
 
-    Interaction interaction() const { return _interaction; }
+    Interaction interaction(Object* o = 0) const;
 
     virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }

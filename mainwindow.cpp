@@ -167,11 +167,18 @@ void MainWindow::addManager(Manager *manager, bool floating)
 QMenu* MainWindow::createToolMenu()
 {
     auto connectAction = [this](const QString& classname, const QAction* action) {
-        connect(action, &QAction::toggled, [this, classname](bool on) {
-            if (!on) return;
-            if (!_scene) return;
-            _scene->setTool(Tool::createInstance(classname));
-        });
+        if (action->isCheckable()) {
+            connect(action, &QAction::toggled, [this, classname](bool on) {
+                if (!on) return;
+                if (!_scene) return;
+                _scene->setTool(Tool::createInstance(classname));
+            });
+        } else {
+            connect(action, &QAction::triggered, [this, classname]() {
+                if (!_scene) return;
+                _scene->setTool(Tool::createInstance(classname));
+            });
+        }
         return action;
     };
 

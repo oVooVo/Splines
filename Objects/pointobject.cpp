@@ -1,4 +1,6 @@
 #include "pointobject.h"
+#include <QDebug>
+#include <limits>
 
 const qreal PointObject::EPS = 4.0;
 
@@ -26,12 +28,24 @@ void PointObject::serialize(QDataStream &stream) const
     stream << _points;
 }
 
-
-
 void PointObject::addPoint(Point* p)
 {
     _points.append(p);
     emit changed();
+}
+
+Point* PointObject::pointAt(QPointF pos) const
+{
+    qreal dist = EPS;
+    Point* point = 0;
+    for (Point* p : points()) {
+        qreal d = (p->point() - pos).manhattanLength();
+        if (d < dist) {
+            point = p;
+            dist = d;
+        }
+    }
+    return point;
 }
 
 void PointObject::selectAll()
