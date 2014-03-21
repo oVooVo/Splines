@@ -1,64 +1,34 @@
 #include "attribute.h"
-#include "transformationattribute.h"
 #include <QDebug>
 
-ATTRIBUTE_CREATOR_MAP_TYPE *Attribute::_creatorMap = 0;
+INIT_CREATOR_MAP(Attribute);
 
-Attribute::Attribute()
+Attribute::Attribute(QString label)
 {
-}
-
-Attribute::Attribute(QDataStream &stream)
-{
-    Q_UNUSED(stream);
-}
-
-void Attribute::polish()
-{
-    makeConnects();
-}
-
-void Attribute::serialize(QDataStream &out) const
-{
-    out << QString(metaObject()->className());
-}
-
-Attribute* Attribute::deserialize(QDataStream &stream)
-{
-    QString classname;
-    stream >> classname;
-
-    Attribute* attribute = createInstance(classname, stream);
-    if (!attribute) {
-        qWarning() << "Warning: Classname " << classname << "not found.";
-        Q_ASSERT_X(attribute, "Attribute::deserialize", "deserialization failed.");
-    }
-    return attribute;
+    _label = label;
 }
 
 QDataStream& operator<<(QDataStream& out, const Attribute* a)
 {
-    a->serialize(out);
+    out << QString(a->metaObject()->className()) << a->_label;
+    (const_cast<Attribute*>(a))->registerAttributeData(out, Attribute::Serialize);
     return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Attribute* &a)
 {
-    a = Attribute::deserialize(in);
-    return in;
-}
+    QString classname;
+    in >> classname;
 
-Attribute *Attribute::createInstance(QString className, QDataStream& stream)
-{
-    if (!_creatorMap)
-    {
-        _creatorMap = new ATTRIBUTE_CREATOR_MAP_TYPE();
+    a = Attribute::createInstance(classname);
+    in >> a->_label;
+
+    if (!a) {
+        qWarning() << "Warning: Classname " << classname << "not found.";
+        Q_ASSERT_X(a, "Attribute::deserialize", "deserialization failed.");
     }
+    a->registerAttributeData(in, Attribute::Deserialize);
 
-    ATTRIBUTE_CREATOR_MAP_TYPE::iterator it = _creatorMap->find(className);
-    if (it == _creatorMap->end())
-        return 0;
-
-    return (it.value())(stream);
+    return in;
 }
 

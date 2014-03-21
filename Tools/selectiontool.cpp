@@ -29,11 +29,15 @@ void SelectionTool::_perform_(Object *o)
             pointObject->select(p);
         }
     } else if (interaction().type() == Interaction::Release) {
-
+        if (interaction().modifiers() != Qt::SHIFT) {
+            pointObject->deselectAll();
+        }
+        if (p) {
+            pointObject->toggleSelection(p);
+        }
     } else if (interaction().type() == Interaction::Move) {
         for (Point* point : pointObject->selection()) {
             point->move(interaction(o).point());
-            _justSelectedOrMoved = true;
         }
         if (!pointObject->selection().isEmpty())
             pointObject->emitChanged();

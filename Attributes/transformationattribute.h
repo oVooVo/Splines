@@ -12,10 +12,7 @@ class TransformationAttribute : public Attribute
     Q_OBJECT
 public:
     enum Key { R, X, Y, SX, SY, Key_first = R, Key_last = SY };
-    TransformationAttribute();
-    TransformationAttribute(QDataStream &stream);
-    void serialize(QDataStream &out) const;
-    void makeConnects();
+    TransformationAttribute(QString label = "Label: ");
 
     QTransform value() const;
     void setValue(QTransform t);
@@ -26,6 +23,9 @@ public:
     qreal sx() const { return _sx; }
     qreal sy() const { return _sy; }
     qreal value(Key k) const;
+
+protected:
+    void registerAttributeData(QDataStream &stream, Direction direction);
 
 public slots:
     void setX(double x);
@@ -47,7 +47,7 @@ private:
     double _sx;
     double _sy;
     double _r;
-    REGISTER_DECL_ATTRIBUTETYPE(TransformationAttribute);
+    REGISTER_DECL_TYPE(Attribute, TransformationAttribute);
 
 };
 

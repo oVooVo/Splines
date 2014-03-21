@@ -1,22 +1,16 @@
 #include "typeattribute.h"
 
-REGISTER_DEFN_ATTRIBUTETYPE(TypeAttribute);
+REGISTER_DEFN_TYPE(Attribute, TypeAttribute);
 
-TypeAttribute::TypeAttribute(QString label, QStringList types)
+TypeAttribute::TypeAttribute(QString label, QStringList types) : Attribute(label)
 {
     _types = types;
-    _label = label;
 }
 
-TypeAttribute::TypeAttribute(QDataStream &stream) : Attribute(stream)
+void TypeAttribute::registerAttributeData(QDataStream &stream, Direction direction)
 {
-    stream >> _types >> _label >> _currentIndex;
-}
-
-void TypeAttribute::serialize(QDataStream &out) const
-{
-    Attribute::serialize(out);
-    out << _types << _label << _currentIndex;
+    REGISTER_DATA(_types)
+    REGISTER_DATA(_currentIndex)
 }
 
 QString TypeAttribute::currentText() const

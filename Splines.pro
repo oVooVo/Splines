@@ -44,7 +44,8 @@ SOURCES += main.cpp\
     Tests/unittest.cpp \
     Attributes/transformationattributetest.cpp \
     Tools/selectalltool.cpp \
-    Tools/deselectalltool.cpp
+    Tools/deselectalltool.cpp \
+    Tools/tangenttool.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -78,7 +79,8 @@ HEADERS  += mainwindow.h \
     Attributes/transformationattributetest.h \
     register_defines.h \
     Tools/selectalltool.h \
-    Tools/deselectalltool.h
+    Tools/deselectalltool.h \
+    Tools/tangenttool.h
 
 
 FORMS    += mainwindow.ui \

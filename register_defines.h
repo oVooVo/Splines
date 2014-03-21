@@ -1,6 +1,9 @@
 #ifndef REGISTERDEFINES_H
 #define REGISTERDEFINES_H
 
+#include <QStringList>
+#include <QMap>
+
 
 /**
   Defines to make use of Attribute system easier.

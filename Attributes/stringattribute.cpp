@@ -1,16 +1,10 @@
 #include "stringattribute.h"
 #include <QDebug>
 
-REGISTER_DEFN_ATTRIBUTETYPE(StringAttribute);
+REGISTER_DEFN_TYPE(Attribute, StringAttribute);
 
-StringAttribute::StringAttribute(QDataStream& stream) : Attribute(stream)
+StringAttribute::StringAttribute(QString label, QString string) : Attribute(label)
 {
-    stream >>_string >> _label;
-}
-
-StringAttribute::StringAttribute(QString label, QString string)
-{
-    _label = label;
     _string = string;
 }
 
@@ -22,13 +16,7 @@ void StringAttribute::setString(const QString &string)
     emit changed();
 }
 
-void StringAttribute::setLabel(const QString &label)
+void StringAttribute::registerAttributeData(QDataStream &stream, Direction direction)
 {
-    _label = label;
-}
-
-void StringAttribute::serialize(QDataStream &out) const
-{
-    Attribute::serialize(out);
-    out << _string << _label;
+    REGISTER_DATA(_string)
 }

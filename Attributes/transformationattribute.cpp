@@ -2,26 +2,15 @@
 #include <qmath.h>
 #include <QDebug>
 
-REGISTER_DEFN_ATTRIBUTETYPE(TransformationAttribute);
+REGISTER_DEFN_TYPE(Attribute, TransformationAttribute);
 
-TransformationAttribute::TransformationAttribute() : Attribute()
+TransformationAttribute::TransformationAttribute(QString label) : Attribute(label)
 {
     _x = 0;
     _y = 0;
     _sx = 1;
     _sy = 1;
     _r = 0;
-    polish();
-}
-
-TransformationAttribute::TransformationAttribute(QDataStream &stream) : Attribute(stream)
-{
-    stream >> _x >> _y >> _sx >> _sy >> _r;
-    polish();
-}
-
-void TransformationAttribute::makeConnects()
-{
     connect(this, SIGNAL(rChanged(double)), this, SIGNAL(changed()));
     connect(this, SIGNAL(xChanged(double)), this, SIGNAL(changed()));
     connect(this, SIGNAL(yChanged(double)), this, SIGNAL(changed()));
@@ -29,10 +18,13 @@ void TransformationAttribute::makeConnects()
     connect(this, SIGNAL(syChanged(double)), this, SIGNAL(changed()));
 }
 
-void TransformationAttribute::serialize(QDataStream &out) const
+void TransformationAttribute::registerAttributeData(QDataStream &stream, Direction direction)
 {
-    Attribute::serialize(out);
-    out << _x << _y << _sx << _sy << _r;
+    REGISTER_DATA(_x)
+    REGISTER_DATA(_y)
+    REGISTER_DATA(_sx)
+    REGISTER_DATA(_sy)
+    REGISTER_DATA(_r)
 }
 
 QTransform TransformationAttribute::value() const

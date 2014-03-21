@@ -21,11 +21,13 @@ void Object::deserialize(QDataStream &stream)
 {
     stream >> _id;
 
+
     qDeleteAll(_attributes);
     stream >> _attributes;
     for (Attribute* a : _attributes) {
         connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
     }
+
 
     QList<Object*> children;
     stream >> children;
@@ -291,6 +293,7 @@ QDataStream& operator>>(QDataStream& stream, Object* &o)
 
     o = Object::createInstance(classname);
     o->deserialize(stream);
+
     if (!o) {
         qWarning() << "Warning: Classname " << classname << "not found.";
         Q_ASSERT_X(o, "Object::deserialize", "deserialization failed.");

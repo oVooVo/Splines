@@ -1,65 +1,62 @@
 #ifndef ATTRIBUTE_H
 #define ATTRIBUTE_H
 
-#include <QObject>
-#include <QDataStream>
-#include <QMap>
+#include "register_defines.h"
 
-
-//TODO register_defines.h!
-
-class Attribute;
-// convienience define to save typing the type often
-#define ATTRIBUTE_CREATOR_MAP_TYPE QMap<QString, Attribute* (*)(QDataStream&)>
-
-//creates a new Attribute of Type T out of a given Stream.
-template<typename T> Attribute *createAttributeFromStream(QDataStream& stream) { return new T(stream); }
-
-
+/**
+ * @brief The Attribute class provides an interface for Attributes. They can be serialized and deserialized
+ *  in an easy way. Derived Attributes should be registered as told in register_defines.h
+ */
 class Attribute : public QObject
 {
     Q_OBJECT
+    DECL_MEMBER(Attribute)
+
 public:
-    Attribute();
-    Attribute(QDataStream& stream);
-    template<typename T> T* cast() const
-    {
-        return (T*) this;
+    Attribute(QString label = "Label");
+    template<typename T> T* cast() const  { return (T*) this; }
+
+    /*
+     * Introduce a macro to simplify (de)serialization
+     * in any derived Attribute class, you need to overwrite
+     *          void registerAttributeData(QDataStream& stream, Direction direction)
+     * and register all data that should be (de)serialized.
+     * Lets assume there is a QImage named _image that you want to be saved and restored
+     * automatically in an ImageAttribute, then overwrite registerAttributeData and write
+     *      Register(_image)
+     */
+protected:
+    enum Direction { Serialize, Deserialize };
+#define REGISTER_DATA(data)         \
+    if (direction == Serialize) {   \
+        stream << (data);           \
+    } else {                        \
+        stream >> (data);           \
+    }
+    virtual void registerAttributeData(QDataStream& stream, Direction direction) {
+        Q_UNUSED(direction);
+        Q_UNUSED(stream);
     }
 
-protected:
-    virtual void serialize(QDataStream& out) const;
-    static Attribute* deserialize(QDataStream& stream);
-    virtual void makeConnects() {}
-    void polish();
-
 signals:
+    /**
+     * @brief changed is emitted whenever this attribute changes.
+     */
     void changed();
-
-protected:
-    static ATTRIBUTE_CREATOR_MAP_TYPE *_creatorMap;
-    static Attribute *createInstance(QString className, QDataStream &stream);
 
     friend QDataStream& operator<<(QDataStream& out, const Attribute* a);
     friend QDataStream& operator>>(QDataStream& in,  Attribute* &a);
+
+private:
+    // every attribute has a label representing the role of the value.
+    QString _label;
+public:
+    QString label() const { return _label; }
+
 };
 
-template<typename T>
-struct AttributeRegister : Attribute
-{
-    AttributeRegister(QString className) : Attribute()
-    {
-        if (!_creatorMap)
-            _creatorMap = new ATTRIBUTE_CREATOR_MAP_TYPE();
-        _creatorMap->insert(className, &createAttributeFromStream<T>);
-    }
-};
+REGISTERER(Attribute)
 
-#define REGISTER_DECL_ATTRIBUTETYPE(CLASSNAME) \
-    static AttributeRegister<CLASSNAME> reg
-
-#define REGISTER_DEFN_ATTRIBUTETYPE(CLASSNAME) \
-    AttributeRegister<CLASSNAME> CLASSNAME::reg(#CLASSNAME)
 
 QDataStream& operator<<(QDataStream& out, const Attribute* a);
 QDataStream& operator>>(QDataStream& in,  Attribute* &a);
