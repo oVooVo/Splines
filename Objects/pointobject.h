@@ -22,11 +22,11 @@ protected:
     virtual void deserialize(QDataStream &stream);
 
 public:
-    void selectAll();
-    void deselectAll();
-    void select(Point* p);
-    void deselect(Point* p);
-    void toggleSelection(Point* p);
+    void selectAllPoints();
+    void deselectAllPoints();
+    void selectPoint(Point* p);
+    void deselectPoint(Point* p);
+    void toggleSelectionOfPoint(Point* p);
     Point* pointAt(const QPointF pos) const;
     Point* selectTangentAt(const QPointF pos) const;
 

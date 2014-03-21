@@ -257,12 +257,21 @@ quint64 Scene::requestId()
     }
 }
 
-QList<Object*> Scene::selectedObjects() const
+QList<Object*> Scene::selectedObjects()
 {
-    QList<Object*> list;
-    for (QModelIndex index : selectionModel()->selection().indexes())
-        list << getObject(index);
-    return list;
+    if (!_selectionUpToDate) {
+        for (Object* o : _selection) {
+            o->deselect();
+        }
+        _selection.clear();
+        for (QModelIndex index : selectionModel()->selection().indexes()) {
+            Object* o = getObject(index);
+            o->select();
+            _selection << o;
+        }
+        _selectionUpToDate = true;
+    }
+    return _selection;
 }
 
 void Scene::processInteraction(const Interaction &interaction)
@@ -367,9 +376,15 @@ void Scene::on_sceneChanged()
 
 void Scene::on_selectionChanged()
 {
+    _selectionUpToDate = false;
     for (Manager* m : _managers) {
         m->selectionChanged();
     }
+}
+
+bool Scene::isSelected(Object *o)
+{
+    return selectedObjects().contains(o);
 }
 
 

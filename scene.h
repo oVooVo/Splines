@@ -94,9 +94,12 @@ private:
     //--------------
 public:
     QItemSelectionModel* selectionModel() const { return _selectionModel; }
-    QList<Object*> selectedObjects() const;
+    QList<Object*> selectedObjects();
+    bool isSelected(Object* o);
 private:
     QItemSelectionModel* _selectionModel = 0;
+    bool _selectionUpToDate = false;
+    QList<Object*> _selection;
 
     //-------------------------
     //

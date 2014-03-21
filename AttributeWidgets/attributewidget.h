@@ -88,6 +88,7 @@ struct AttributeWidgetRegister
 
 
 #define REGISTER_DECL_ATTRIBUTEWIDGETTYPE(CLASSNAME) \
+private:                                             \
     static AttributeWidgetRegister<CLASSNAME> reg
 
 #define REGISTER_DEFN_ATTRIBUTEWIDGETTYPE(CLASSNAME) \

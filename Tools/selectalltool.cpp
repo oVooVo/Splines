@@ -11,7 +11,7 @@ SelectAllTool::SelectAllTool()
 void SelectAllTool::perform_virtual(Object *o)
 {
     PointObject* p = (PointObject*) o;
-    p->selectAll();
+    p->selectAllPoints();
 }
 
 bool SelectAllTool::canPerform(const Object *o) const

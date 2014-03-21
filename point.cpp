@@ -21,7 +21,7 @@ void Point::draw(QPainter &painter)
     pen.setWidth(4);
     painter.setPen(pen);
     painter.drawPoint(point());
-    if (true) {
+    if (tangentsShown()) {
         pen.setWidth(3);
         painter.setPen(pen);
         painter.drawPoint(leftTangent());
@@ -59,34 +59,40 @@ QPointF toCartesian(Polar p)
                 qSin(p.phi) * p.r);
 }
 
+QPointF opposite(QPointF selectedOld, QPointF unselectedOld, QPointF selectedNew)
+{
+    if (qFuzzyIsNull(length(selectedOld)) && qFuzzyIsNull(length(unselectedOld))) {
+        return selectedOld - selectedNew;
+    }
+
+    Polar selectedOldPolar = toPolar(selectedOld);
+    Polar selectedNewPolar = toPolar(selectedNew);
+    Polar unselectedOldPolar = toPolar(unselectedOld);
+
+    Polar invariant;
+    invariant.r   = unselectedOldPolar.r   / selectedOldPolar.r;
+    invariant.phi = unselectedOldPolar.phi - selectedOldPolar.phi;
+
+    Polar unselectedNewPolar;
+    unselectedNewPolar.r   = selectedNewPolar.r   * invariant.r;
+    unselectedNewPolar.phi = selectedNewPolar.phi + invariant.phi;
+
+    return toCartesian(unselectedNewPolar);
+
+}
+
 void Point::moveTangent(QPointF t, TangentMode mode)
 {
-    qreal r = 1;
-    qreal phi = 0;
-    if (mode == Simultan) {
-        QPointF selectedOld = tangent(selectedTangent()) - _point;
-        r = length(selectedOld + t) / length(selectedOld);
-        phi = toPolar(selectedOld + t).phi - toPolar(selectedOld).phi;
-    }
-    Polar polar;
     switch (selectedTangent()) {
     case LeftTangent:
+        if (mode == Simultan)
+            _right = opposite(_left, _right, _left + t);
         _left += t;
-        if (mode == Simultan) {
-            polar = toPolar(_right);
-            polar.phi += phi;
-            _right = toCartesian(polar);
-            _right *= r;
-        }
         break;
     case RightTangent:
+        if (mode == Simultan)
+            _left = opposite(_right, _left, _right + t);
         _right += t;
-        if (mode == Simultan) {
-            polar = toPolar(_left);
-            polar.phi += phi;
-            _left = toCartesian(polar);
-            _left *= r;
-        }
         break;
     case NoTangent:
     default:
@@ -97,6 +103,12 @@ void Point::moveTangent(QPointF t, TangentMode mode)
 void Point::selectTangent(Tangent tangent)
 {
     _selectedTangent = tangent;
+}
+
+void Point::setTangent(QPointF left, QPointF right)
+{
+    _left = left;
+    _right = right;
 }
 
 QDataStream& operator<<(QDataStream& out, const Point* s)

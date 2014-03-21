@@ -210,7 +210,7 @@ private:
      */
     bool _id_set_by_user = false;
 
-    //TODO make attribute out of this!
+
 public:
     QString name() const;
     void setName(QString name);
@@ -244,6 +244,7 @@ public:
     QHash<QString, Attribute*> attributes() const { return _attributes; }
 
     static QStringList attributeKeys(QString classname);
+    template<typename T> T* attribute(QString key) const;
 
 
 
@@ -287,6 +288,21 @@ public:
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
     bool isCommand() const { return true; }    // the "new Object Tool" is a command
+
+
+    //-------------------------------
+    //
+    // keep track of own selection
+    //
+    //--------------------------------
+public:
+    void setSelected(bool selected);
+    void select() { setSelected(true); }
+    void deselect() { setSelected(false); }
+    bool isSelected() const { return _isSelected; }
+private:
+    bool _isSelected = false;
+
 
 
 

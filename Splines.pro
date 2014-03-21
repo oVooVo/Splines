@@ -45,7 +45,11 @@ SOURCES += main.cpp\
     Attributes/transformationattributetest.cpp \
     Tools/selectalltool.cpp \
     Tools/deselectalltool.cpp \
-    Tools/tangenttool.cpp
+    Tools/tangenttool.cpp \
+    Objects/Spline/linearpiece.cpp \
+    Dialogs/pointeditdialog.cpp \
+    Attributes/boolattribute.cpp \
+    AttributeWidgets/boolwidget.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -80,10 +84,15 @@ HEADERS  += mainwindow.h \
     register_defines.h \
     Tools/selectalltool.h \
     Tools/deselectalltool.h \
-    Tools/tangenttool.h
+    Tools/tangenttool.h \
+    Objects/Spline/linearpiece.h \
+    Dialogs/pointeditdialog.h \
+    Attributes/boolattribute.h \
+    AttributeWidgets/boolwidget.h
 
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \
     AttributeWidgets/stringwidget.ui \
-    AttributeWidgets/typewidget.ui
+    AttributeWidgets/typewidget.ui \
+    Dialogs/pointeditdialog.ui

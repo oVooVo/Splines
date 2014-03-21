@@ -19,6 +19,8 @@ public:
     void setTangent(QPointF left, QPointF right);
     QPointF leftTangent() const { return _left + _point; }
     QPointF rightTangent() const { return _right + _point; }
+    QPointF left() const { return _left; }
+    QPointF right() const { return _right; }
     QPointF tangent(Tangent tangent) const { return (tangent == LeftTangent ?
                                                        leftTangent() :
                                                        rightTangent()  ); }
@@ -37,8 +39,8 @@ public:
     void draw(QPainter &painter);
 
 private:
-    QPointF _left  = QPointF(100, 100);
-    QPointF _right = QPointF(-50, -50);
+    QPointF _left;
+    QPointF _right;
     QPointF _point;
     Tangent _selectedTangent = NoTangent;
     bool _showTangents = false;

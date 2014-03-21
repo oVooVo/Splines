@@ -1,5 +1,7 @@
 #include "selectiontool.h"
 #include <QDebug>
+#include "Dialogs/pointeditdialog.h"
+#include "Objects/spline.h"
 
 REGISTER_DEFN_TYPE(Tool, SelectionTool);
 
@@ -24,24 +26,30 @@ void SelectionTool::perform_virtual(Object *o)
     PointObject* pointObject = (PointObject*) o;
     Point* p = pointObject->pointAt(interaction(o).point());
 
+    if (p && interaction().click() == Interaction::DoubleClick) {
+        PointEditDialog::exec_static(p,
+                                     pointObject->inherits(CLASSNAME(Spline)) && ((Spline*) pointObject)->type() == Spline::Bezier,
+                                     parentWidget());
+    }
+
     if (interaction().type() == Interaction::Press) {
         if (p && !p->isSelected()) {
             _justSelectedOrRemoved = true;
         }
         if (interaction().modifiers() != Qt::SHIFT)
-            pointObject->deselectAll();
+            pointObject->deselectAllPoints();
         if (p) {
-            pointObject->select(p);
+            pointObject->selectPoint(p);
         }
     } else if (interaction().type() == Interaction::Release) {
         if (interaction().modifiers() != Qt::SHIFT) {
-            pointObject->deselectAll();
+            pointObject->deselectAllPoints();
         }
         if (p && !p->isSelected()) {
-            pointObject->select(p);
+            pointObject->selectPoint(p);
         }
         if (p && p->isSelected() && !_justSelectedOrRemoved) {
-            pointObject->deselect(p);
+            pointObject->deselectPoint(p);
         }
         _justSelectedOrRemoved = false;
     } else if (interaction().type() == Interaction::Move) {

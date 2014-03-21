@@ -236,6 +236,11 @@ QPointF Object::map(QPointF pos, bool translate) const
     return trans.map(pos);
 }
 
+template<typename T> T* Object::attribute(QString key) const
+{
+    return (T*) (attributes()[key]);
+}
+
 QStringList Object::attributeKeys(QString classname)
 {
 
@@ -276,6 +281,14 @@ QList<quint64> Object::idsOfAllDescendants() const
 
 void Object::emitChanged()
 {
+    emit changed();
+}
+
+void Object::setSelected(bool selected)
+{
+    if (_isSelected == selected) return;
+
+    _isSelected = selected;
     emit changed();
 }
 

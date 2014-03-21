@@ -34,29 +34,29 @@ void PointObject::addPoint(Point* p)
     emit changed();
 }
 
-void PointObject::selectAll()
+void PointObject::selectAllPoints()
 {
     if (_selected.size() == _points.size()) return;
     blockSignals(true);
     for (Point* p : points()) {
-        select(p);
+        selectPoint(p);
     }
     blockSignals(false);
     emit changed();
 }
 
-void PointObject::deselectAll()
+void PointObject::deselectAllPoints()
 {
     if (_selected.isEmpty()) return;
     blockSignals(true);
     for (Point* p : points()) {
-        deselect(p);
+        deselectPoint(p);
     }
     blockSignals(false);
     emit changed();
 }
 
-void PointObject::select(Point* p)
+void PointObject::selectPoint(Point* p)
 {
     if (p->isSelected()) return;
     p->select();
@@ -64,7 +64,7 @@ void PointObject::select(Point* p)
     emit changed();
 }
 
-void PointObject::deselect(Point* p)
+void PointObject::deselectPoint(Point* p)
 {
     if (!p->isSelected()) return;
     p->deselect();
@@ -72,12 +72,12 @@ void PointObject::deselect(Point* p)
     emit changed();
 }
 
-void PointObject::toggleSelection(Point *p)
+void PointObject::toggleSelectionOfPoint(Point *p)
 {
     if (p->isSelected())
-        select(p);
+        selectPoint(p);
     else
-        deselect(p);
+        deselectPoint(p);
     emit changed();
 }
 
@@ -113,7 +113,7 @@ Point* PointObject::selectTangentAt(const QPointF pos) const
             dist = d1;
             tangent = Point::LeftTangent;
             pointWithTangent = p;
-        } else if (d2 < d1 && d2 < dist){
+        } else if (d2 < dist) {
             dist = d2;
             tangent = Point::RightTangent;
             pointWithTangent = p;
@@ -122,6 +122,7 @@ Point* PointObject::selectTangentAt(const QPointF pos) const
 
     if (pointWithTangent)
         pointWithTangent->selectTangent(tangent);
+
     return pointWithTangent;
 }
 

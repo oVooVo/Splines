@@ -10,18 +10,13 @@ class Spline : public PointObject
 {
     Q_OBJECT
 public:
+    enum Type { Linear, Cubic, BSpline, Bezier, Invalid };
     Spline(Object* parent = 0);
     QPointF operator() (qreal t) const { return at(t); }
     QPointF at(qreal t) const;
+    Type type() const;
 
 public:
-    /*
-    void select(QPointF globalePosition, bool extend = false);
-    void moveSelected(QPointF t);
-    void removeSelected();
-    void insert(QPointF globalePos);
-    void remove(QPointF globalePos);
-    */
 
     void drawIndividual(QPainter &painter);
     void serialize(QDataStream &stream) const;
