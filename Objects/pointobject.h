@@ -28,7 +28,7 @@ public:
     void deselect(Point* p);
     void toggleSelection(Point* p);
     Point* pointAt(const QPointF pos) const;
-    Point* tangentAt(const QPointF pos, Point::Tangent &tangent) const;
+    Point* selectTangentAt(const QPointF pos) const;
 
 private:
     QList<Point*> _points;

@@ -96,11 +96,13 @@ Point* PointObject::pointAt(QPointF pos) const
 }
 
 
-Point* PointObject::tangentAt(const QPointF pos, Point::Tangent &tangent) const
+Point* PointObject::selectTangentAt(const QPointF pos) const
 {
     auto distanceOfTangent = [](Point* p, Point::Tangent t, QPointF pos) {
         return (pos - p->tangent(t)).manhattanLength();
     };
+
+    Point::Tangent tangent = Point::NoTangent;
 
     qreal dist = EPS;
     Point* pointWithTangent = 0;
@@ -118,6 +120,8 @@ Point* PointObject::tangentAt(const QPointF pos, Point::Tangent &tangent) const
         }
     }
 
+    if (pointWithTangent)
+        pointWithTangent->selectTangent(tangent);
     return pointWithTangent;
 }
 

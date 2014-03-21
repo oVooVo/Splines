@@ -46,12 +46,15 @@ public:
     //return copy of this with mapped transformation
     Interaction mapCopy(QTransform t) const;
 
+    Qt::MouseButtons pressedButtons() const { return _buttonsDown; }
+
 private:
     Click                 _click     = NoClick;
     Qt::KeyboardModifiers _modifiers = Qt::NoModifier;
     Qt::MouseButton       _button    = Qt::NoButton;
     QPointF               _point     = QPointF();
     Type                  _type      = Invalid;
+    static Qt::MouseButtons _buttonsDown;
 };
 
 #endif // INTERACTION_H

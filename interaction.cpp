@@ -1,6 +1,8 @@
 #include "interaction.h"
 #include <QDebug>
 
+Qt::MouseButtons Interaction::_buttonsDown = Qt::NoButton;
+
 const Interaction Interaction::NoInteraction = Interaction();
 
 Interaction::Interaction(Qt::MouseButton button, QPointF pos, Type type, Click click, Qt::KeyboardModifiers modifiers)
@@ -8,9 +10,22 @@ Interaction::Interaction(Qt::MouseButton button, QPointF pos, Type type, Click c
     _button = button;
     _point = pos;
     _type = type;
-    Q_ASSERT(type != Move);
     _click = click;
     _modifiers = modifiers;
+
+    switch (_type) {
+    case Press:
+        _buttonsDown |= button;
+        break;
+    case Release:
+        _buttonsDown &= ~button;
+        break;
+    case Move:
+    case Invalid:
+    default:
+        Q_ASSERT_X(false, "Interaction::Interaction", "Calles wrong constructor");
+        break;
+    }
 }
 
 Interaction::Interaction(QPointF t, Qt::KeyboardModifiers modifiers)
