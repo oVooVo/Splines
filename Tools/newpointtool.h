@@ -12,7 +12,7 @@ public:
     QString actionText() const { return tr("Add Point"); }
 
 protected:
-    void _perform_(Object *o);
+    void perform_virtual(Object *o);
     bool canPerform(const Object *o) const;
 
 private:

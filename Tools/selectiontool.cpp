@@ -3,6 +3,8 @@
 
 REGISTER_DEFN_TYPE(Tool, SelectionTool);
 
+bool SelectionTool::_justSelectedOrRemoved = false;
+
 SelectionTool::SelectionTool()
 {
 }
@@ -17,29 +19,38 @@ bool SelectionTool::canPerform(const Object *o) const
     return false;
 }
 
-void SelectionTool::_perform_(Object *o)
+void SelectionTool::perform_virtual(Object *o)
 {
     PointObject* pointObject = (PointObject*) o;
     Point* p = pointObject->pointAt(interaction(o).point());
 
     if (interaction().type() == Interaction::Press) {
+        if (p && !p->isSelected()) {
+            _justSelectedOrRemoved = true;
+        }
         if (interaction().modifiers() != Qt::SHIFT)
             pointObject->deselectAll();
-        if (p && !p->isSelected()) {
+        if (p) {
             pointObject->select(p);
         }
     } else if (interaction().type() == Interaction::Release) {
         if (interaction().modifiers() != Qt::SHIFT) {
             pointObject->deselectAll();
         }
-        if (p) {
-            pointObject->toggleSelection(p);
+        if (p && !p->isSelected()) {
+            pointObject->select(p);
         }
+        if (p && p->isSelected() && !_justSelectedOrRemoved) {
+            pointObject->deselect(p);
+        }
+        _justSelectedOrRemoved = false;
     } else if (interaction().type() == Interaction::Move) {
         for (Point* point : pointObject->selection()) {
             point->move(interaction(o).point());
         }
-        if (!pointObject->selection().isEmpty())
+        if (!pointObject->selection().isEmpty()) {
             pointObject->emitChanged();
+            _justSelectedOrRemoved = true;
+        }
     }
 }

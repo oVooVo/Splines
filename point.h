@@ -7,11 +7,13 @@
 class Point
 {
 public:
+    enum Tangent { LeftTangent, RightTangent };
     explicit Point(qreal x, qreal y) { _point = QPointF(x, y); }
     explicit Point(QPointF point);
     void setTangent(QPointF left, QPointF right);
     QPointF leftTangent() const { return _left; }
     QPointF rightTangent() const { return _right; }
+    QPointF tangent(Tangent tangent) const { return (tangent == LeftTangent ? _left : _right); }
     QPointF leftTangentGlobal() const { return _left + _point; }
     QPointF rightTangentGlobal() const { return _right + _point; }
     void setPoint(QPointF p);

@@ -14,9 +14,12 @@ public:
 
 protected:
     bool canPerform(const Object *o) const;
-    void _perform_(Object *o);
+    void perform_virtual(Object *o);
 
     REGISTER_DECL_TYPE(Tool, SelectionTool);
+
+private:
+    static bool _justSelectedOrRemoved;
 };
 
 #endif // SELECTIONTOOL_H

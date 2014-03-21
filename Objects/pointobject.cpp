@@ -34,20 +34,6 @@ void PointObject::addPoint(Point* p)
     emit changed();
 }
 
-Point* PointObject::pointAt(QPointF pos) const
-{
-    qreal dist = EPS;
-    Point* point = 0;
-    for (Point* p : points()) {
-        qreal d = (p->point() - pos).manhattanLength();
-        if (d < dist) {
-            point = p;
-            dist = d;
-        }
-    }
-    return point;
-}
-
 void PointObject::selectAll()
 {
     if (_selected.size() == _points.size()) return;
@@ -95,22 +81,53 @@ void PointObject::toggleSelection(Point *p)
     emit changed();
 }
 
-
-/*
-void PointObject::handleSelection(Point *p, bool extended)
+Point* PointObject::pointAt(QPointF pos) const
 {
-    if (!p->isSelected()) {
-        if (!extended) {
-            deselectAll();
-        }
-        select(p);
-    } else {
-        if (extended) {
-            deselect(p);
-        } else {
-            deselectAll();
-            select(p);
+    qreal dist = EPS;
+    Point* point = 0;
+    for (Point* p : points()) {
+        qreal d = (p->point() - pos).manhattanLength();
+        if (d < dist) {
+            point = p;
+            dist = d;
         }
     }
+    return point;
 }
-*/
+
+
+Point* PointObject::tangentAt(const QPointF pos, Point::Tangent &tangent) const
+{
+    auto distanceOfTangent = [](Point* p, Point::Tangent t, QPointF pos) {
+        return (pos - p->tangent(t)).manhattanLength();
+    };
+
+    qreal dist = EPS;
+    Point* pointWithTangent = 0;
+    for (Point* p : points()) {
+        qreal d1 = distanceOfTangent(p, Point::LeftTangent, pos);
+        qreal d2 = distanceOfTangent(p, Point::RightTangent, pos);
+        if (d1 < d2 && d1 < dist) {
+            dist = d1;
+            tangent = Point::LeftTangent;
+            pointWithTangent = p;
+        } else if (d2 < d1 && d2 < dist){
+            dist = d2;
+            tangent = Point::RightTangent;
+            pointWithTangent = p;
+        }
+    }
+
+    return pointWithTangent;
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -18,7 +18,7 @@ bool NewPointTool::canPerform(const Object *o) const
             && o->inherits(CLASSNAME(PointObject));
 }
 
-void NewPointTool::_perform_(Object *o)
+void NewPointTool::perform_virtual(Object *o)
 {
     PointObject* p = (PointObject*) o;
     p->addPoint(new Point(o->map(interaction().point())));

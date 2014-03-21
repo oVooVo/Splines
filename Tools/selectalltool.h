@@ -15,7 +15,7 @@ public:
 
 
 protected:
-    void _perform_(Object *o);
+    void perform_virtual(Object *o);
     bool canPerform(const Object *o) const;
 
     REGISTER_DECL_TYPE(Tool, SelectAllTool);

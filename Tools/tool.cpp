@@ -14,7 +14,7 @@ void Tool::config(const Interaction &interaction)
 void Tool::perform(Object *o)
 {
     if (canPerform(o))
-        _perform_(o);
+        perform_virtual(o);
 }
 
 Interaction Tool::interaction(Object *o) const

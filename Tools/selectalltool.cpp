@@ -8,7 +8,7 @@ SelectAllTool::SelectAllTool()
 {
 }
 
-void SelectAllTool::_perform_(Object *o)
+void SelectAllTool::perform_virtual(Object *o)
 {
     PointObject* p = (PointObject*) o;
     p->selectAll();

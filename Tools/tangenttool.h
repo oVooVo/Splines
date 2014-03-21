@@ -5,14 +5,15 @@
 
 class TangentTool : public Tool
 {
+    Q_OBJECT
 public:
     TangentTool();
 
     bool isCommand() const { return false; }
 
 protected:
-    bool canPerform(const Object* ) const { return false; }
-    void _perform_(Object*) {}
+    bool canPerform(const Object* o) const;
+    void perform_virtual(Object*);
 
 
     REGISTER_DECL_TYPE(Tool, TangentTool);

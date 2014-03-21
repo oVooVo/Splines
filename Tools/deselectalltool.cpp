@@ -8,7 +8,7 @@ DeselectAllTool::DeselectAllTool()
 {
 }
 
-void DeselectAllTool::_perform_(Object *o)
+void DeselectAllTool::perform_virtual(Object *o)
 {
     PointObject* p = (PointObject*) o;
     p->deselectAll();
