@@ -9,6 +9,8 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QDebug>
+#include "preferences.h"
+#include "preferencedialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(load()));
     connect(ui->actionNewScene, SIGNAL(triggered()), this, SLOT(newScene()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionPreferences, &QAction::triggered, [this](){
+        PreferenceDialog dialog(this);
+        dialog.exec();
+    });
 
     menuBar()->addMenu(createToolMenu());
     menuBar()->addMenu(createManagerMenu());
@@ -39,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
     addManager(m, false);
     addDockWidget(Qt::RightDockWidgetArea, m);
     m->setScene(_scene);
+
+    Preferences::init();
+    Preferences::readSettings();
 }
 
 MainWindow::~MainWindow()

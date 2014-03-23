@@ -8,7 +8,7 @@ class LinearPiece
 {
 public:
     LinearPiece(Point *start, Point *end);
-    QPointF operator ()(qreal t) const;
+    QPointF operator ()(double t) const;
 
 private:
     Point* _start;

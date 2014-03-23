@@ -1,8 +1,7 @@
 #include "pointobject.h"
 #include <QDebug>
 #include <limits>
-
-const qreal PointObject::EPS = 4.0;
+#include "preferences.h"
 
 PointObject::PointObject(Object* parent)  : Object(parent)
 {
@@ -13,8 +12,10 @@ void PointObject::deserialize(QDataStream &stream)
 {
     Object::deserialize(stream);
     stream >> _points;
-    for (Point* p : _points)
+    for (Point* p : _points) {
+        p->setPointObject(this);
         if (p->isSelected()) _selected.append(p);
+    }
 }
 
 PointObject::~PointObject()
@@ -30,6 +31,7 @@ void PointObject::serialize(QDataStream &stream) const
 
 void PointObject::addPoint(Point* p)
 {
+    p->setPointObject(this);
     _points.append(p);
     emit changed();
 }
@@ -59,6 +61,7 @@ void PointObject::deselectAllPoints()
 void PointObject::selectPoint(Point* p)
 {
     if (p->isSelected()) return;
+
     p->select();
     _selected.append(p);
     emit changed();
@@ -67,6 +70,7 @@ void PointObject::selectPoint(Point* p)
 void PointObject::deselectPoint(Point* p)
 {
     if (!p->isSelected()) return;
+
     p->deselect();
     _selected.removeOne(p);
     emit changed();
@@ -83,7 +87,7 @@ void PointObject::toggleSelectionOfPoint(Point *p)
 
 Point* PointObject::pointAt(QPointF pos) const
 {
-    qreal dist = EPS;
+    qreal dist = Preferences::doubles["Grabber.Tolerance"];
     Point* point = 0;
     for (Point* p : points()) {
         qreal d = (p->point() - pos).manhattanLength();
@@ -104,7 +108,7 @@ Point* PointObject::selectTangentAt(const QPointF pos) const
 
     Point::Tangent tangent = Point::NoTangent;
 
-    qreal dist = EPS;
+    qreal dist = Preferences::doubles["Grabber.Tolerance"];
     Point* pointWithTangent = 0;
     for (Point* p : points()) {
         qreal d1 = distanceOfTangent(p, Point::LeftTangent, pos);

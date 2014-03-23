@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 #include "interaction.h"
+#include "preferences.h"
 
 Viewport::Viewport(QWidget *parent) : QWidget(parent)
 {
@@ -30,7 +31,7 @@ void Viewport::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     if (_scene) {
-        painter.fillRect(rect(), Qt::white);
+        painter.fillRect(rect(), Preferences::colors["Background"]);
         _globaleTransformation = QTransform::fromTranslate(width()/2, height()/2);
         painter.setTransform(_globaleTransformation);
         _scene->draw(painter);

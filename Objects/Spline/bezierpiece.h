@@ -7,7 +7,7 @@ class BezierPiece : public SplinePiece
 {
 public:
     BezierPiece(Point* start, Point* end);
-    QPointF operator ()(qreal t) const;
+    QPointF operator ()(double t) const;
 
 private:
     Point* _start;

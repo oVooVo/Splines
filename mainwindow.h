@@ -31,7 +31,7 @@ public slots:
     bool newScene();
 
 private:
-    bool _isSaved;
+    bool _isSaved = true;
     bool canDiscard();
 
 protected:

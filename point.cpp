@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <qmath.h>
 #include <QPair>
+#include "Objects/pointobject.h"
+#include "preferences.h"
 
 Point::Point(QPointF point)
 {
@@ -17,8 +19,15 @@ void Point::draw(QPainter &painter)
 {
     painter.save();
     QPen pen;
-    pen.setColor(isSelected() ? QColor(100, 255, 0) : QColor(0, 0, 0));
+    pen.setCosmetic(true);
     pen.setWidth(4);
+    if (!_pointObject->isSelected()) {
+        pen.setColor(Preferences::colors["Point.inactive"]);
+    } else if (isSelected()) {
+        pen.setColor(Preferences::colors["Point.active.selected"]);
+    } else {
+        pen.setColor(Preferences::colors["Point.active.deselected"]);
+    }
     painter.setPen(pen);
     painter.drawPoint(point());
     if (tangentsShown()) {

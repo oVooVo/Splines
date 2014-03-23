@@ -33,8 +33,6 @@ public:
 private:
     QList<Point*> _points;
     QList<Point*> _selected;
-    static const qreal EPS;
-
 };
 
 #endif // POINTOBJECT_H

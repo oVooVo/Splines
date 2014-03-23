@@ -4,6 +4,7 @@
 #include <QPointF>
 #include <QPainter>
 
+class PointObject;
 class Point
 {
 public:
@@ -37,6 +38,7 @@ public:
     void moveTangent(QPointF t, TangentMode mode);
 
     void draw(QPainter &painter);
+    void setPointObject(PointObject* pointObject) { _pointObject = pointObject; }
 
 private:
     QPointF _left;
@@ -45,6 +47,7 @@ private:
     Tangent _selectedTangent = NoTangent;
     bool _showTangents = false;
     bool _isSelected = false;
+    PointObject* _pointObject = 0;
 
 protected:
     friend QDataStream& operator<<(QDataStream& out, const Point* s);

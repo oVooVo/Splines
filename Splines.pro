@@ -49,7 +49,13 @@ SOURCES += main.cpp\
     Objects/Spline/linearpiece.cpp \
     Dialogs/pointeditdialog.cpp \
     Attributes/boolattribute.cpp \
-    AttributeWidgets/boolwidget.cpp
+    AttributeWidgets/boolwidget.cpp \
+    Objects/Spline/bpiece.cpp \
+    Objects/Spline/cubicpiece.cpp \
+    preferences.cpp \
+    gradient.cpp \
+    colorbutton.cpp \
+    preferencedialog.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -88,11 +94,18 @@ HEADERS  += mainwindow.h \
     Objects/Spline/linearpiece.h \
     Dialogs/pointeditdialog.h \
     Attributes/boolattribute.h \
-    AttributeWidgets/boolwidget.h
+    AttributeWidgets/boolwidget.h \
+    Objects/Spline/bpiece.h \
+    Objects/Spline/cubicpiece.h \
+    preferences.h \
+    gradient.h \
+    colorbutton.h \
+    preferencedialog.h
 
 
 FORMS    += mainwindow.ui \
     AttributeWidgets/transformationwidget.ui \
     AttributeWidgets/stringwidget.ui \
     AttributeWidgets/typewidget.ui \
-    Dialogs/pointeditdialog.ui
+    Dialogs/pointeditdialog.ui \
+    preferencedialog.ui

@@ -12,12 +12,15 @@ class Spline : public PointObject
 public:
     enum Type { Linear, Cubic, BSpline, Bezier, Invalid };
     Spline(Object* parent = 0);
-    QPointF operator() (qreal t) const { return at(t); }
-    QPointF at(qreal t) const;
+    QPointF operator() (double t) const { return at(t); }
+    QPointF at(double t) const;
     Type type() const;
 
-public:
+    int segment(double t) const;
+    int segments() const;
+    bool isClosed() const;
 
+public:
     void drawIndividual(QPainter &painter);
     void serialize(QDataStream &stream) const;
 
