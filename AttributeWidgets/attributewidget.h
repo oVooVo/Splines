@@ -67,6 +67,7 @@ private:
 
 protected:
     static const QString MULTI_LABEL;
+
 };
 
 /**

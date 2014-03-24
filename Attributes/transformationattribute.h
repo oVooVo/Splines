@@ -24,6 +24,9 @@ public:
     qreal sy() const { return _sy; }
     qreal value(Key k) const;
 
+    QString toString() const;
+    void fromString(QString string);
+
 protected:
     void registerAttributeData(QDataStream &stream, Direction direction);
 

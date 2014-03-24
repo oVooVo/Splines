@@ -4,6 +4,7 @@
 #include <QPair>
 #include "Objects/pointobject.h"
 #include "preferences.h"
+#include "Attributes/colorattribute.h"
 
 Point::Point(QPointF point)
 {
@@ -22,11 +23,11 @@ void Point::draw(QPainter &painter)
     pen.setCosmetic(true);
     pen.setWidth(4);
     if (!_pointObject->isSelected()) {
-        pen.setColor(Preferences::colors["Point.inactive"]);
+        pen.setColor(Preferences::value<ColorAttribute>("colors.point.inactive")->color());
     } else if (isSelected()) {
-        pen.setColor(Preferences::colors["Point.active.selected"]);
+        pen.setColor(Preferences::value<ColorAttribute>("colors.point.active.selected")->color());
     } else {
-        pen.setColor(Preferences::colors["Point.active.deselected"]);
+        pen.setColor(Preferences::value<ColorAttribute>("colors.point.active.deselected")->color());
     }
     painter.setPen(pen);
     painter.drawPoint(point());

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <limits>
 #include "preferences.h"
+#include "Attributes/doubleattribute.h"
 
 PointObject::PointObject(Object* parent)  : Object(parent)
 {
@@ -87,7 +88,7 @@ void PointObject::toggleSelectionOfPoint(Point *p)
 
 Point* PointObject::pointAt(QPointF pos) const
 {
-    qreal dist = Preferences::doubles["Grabber.Tolerance"];
+    qreal dist = Preferences::value<DoubleAttribute>("grabber.tolerance.tolerance")->value();
     Point* point = 0;
     for (Point* p : points()) {
         qreal d = (p->point() - pos).manhattanLength();
@@ -108,7 +109,7 @@ Point* PointObject::selectTangentAt(const QPointF pos) const
 
     Point::Tangent tangent = Point::NoTangent;
 
-    qreal dist = Preferences::doubles["Grabber.Tolerance"];
+    qreal dist = Preferences::value<DoubleAttribute>("grabber.tolerance.tolerance")->value();
     Point* pointWithTangent = 0;
     for (Point* p : points()) {
         qreal d1 = distanceOfTangent(p, Point::LeftTangent, pos);

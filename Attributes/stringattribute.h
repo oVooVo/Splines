@@ -10,6 +10,8 @@ class StringAttribute : public Attribute
 public:
     StringAttribute(QString label = "Label: ", QString string = "");
     QString string() const { return _string; }
+    void fromString(QString string);
+    QString toString() const;
 
 public slots:
     void setString(const QString &string);

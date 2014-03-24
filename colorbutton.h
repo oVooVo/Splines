@@ -10,10 +10,11 @@ class ColorButton : public QPushButton
 public:
     explicit ColorButton(QWidget *parent = 0);
     QColor color() const { return _color; }
-    void setColor(QColor color) { _color = color; }
+    void setColor(QColor color) { _color = color; _multiState = false; }
+    void setMulti() { _multiState = true; setText("Multi"); }
 
 protected:
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
 
 signals:
     void colorChanged(QColor);
@@ -21,6 +22,7 @@ signals:
 private:
     QColor _color = QColor();
     QString _label = "";
+    bool _multiState = false;
 
 };
 

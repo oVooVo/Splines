@@ -1,83 +1,53 @@
 #include "preferences.h"
 #include <QSettings>
 #include <QDebug>
+#include "Attributes/colorattribute.h"
+#include "Attributes/doubleattribute.h"
 
-QMap<QString, QColor> Preferences::colors;
-QMap<QString, double> Preferences::doubles;
+QMap<QString, Attribute*> Preferences::_attributes;
+
 
 void Preferences::init()
 {
-    initColors();
-    initDoubles();
+    Q_ASSERT(_attributes.isEmpty());
+
+    // PreferenceDialog creates a tab widget out of the _attributes.
+    // _attribute's keys have form Tab.GroupBox.Name where name is replaced with the attributes label.
+
+    _attributes.insert("colors.point.active.selected",
+                       new ColorAttribute("Selected: " , QColor(232, 121, 0)));
+    _attributes.insert("colors.point.active.deselected",
+                       new ColorAttribute("Deselected: ", QColor(80, 60, 45)));
+    _attributes.insert("colors.point.inactive",
+                       new ColorAttribute("Inactive: ", QColor(100, 90, 80)));
+    _attributes.insert("colors.spline.active.start",
+                       new ColorAttribute("Start: ", QColor(0, 255, 0)));
+    _attributes.insert("colors.spline.active.end",
+                       new ColorAttribute("End: ", QColor(0, 255, 255)));
+    _attributes.insert("colors.spline.inactive",
+                       new ColorAttribute("Inactive: ", QColor(128, 128, 128)));
+    _attributes.insert("colors.background",
+                       new ColorAttribute("Background: ", QColor(255, 255, 255)));
+    _attributes.insert("grabber.tolerance.tolerance",
+                       new DoubleAttribute("Tolerance:", 4.0));
 }
-
-void Preferences::initColors()
-{
-    colors.clear();
-    colors.insert("Point.active.selected",
-                  QColor(232, 121, 0));
-    colors.insert("Point.active.deselected",
-                  QColor(80, 60, 45));
-    colors.insert("Point.inactive",
-                  QColor(100, 90, 80));
-    colors.insert("Spline.active.start",
-                  QColor(0, 255, 0));
-    colors.insert("Spline.active.end",
-                  QColor(0, 255, 255));
-    colors.insert("Spline.inactive",
-                  QColor(128, 128, 128));
-    colors.insert("Background",
-                  QColor(255, 255, 255));
-}
-
-void Preferences::initDoubles()
-{
-    doubles.clear();
-    doubles.insert("Grabber.Tolerance", 4);
-}
-
-QColor fromHex(QString hex)
-{
-    auto getHex = [](QString h, int def) {
-        bool ok;
-        int i = h.toInt(&ok, 16);
-        return ok ? i : def;
-    };
-
-    return QColor(getHex(hex.mid(0, 2), 0), getHex(hex.mid(2, 2), 0  ),
-                  getHex(hex.mid(4, 2), 0), getHex(hex.mid(6, 2), 255));
-}
-
-QString toHex(QColor color)
-{
-    QString s;
-    s.append(QString("%1%2%3%4")
-             .arg(color.red(),   2, 16, QChar('0'))
-             .arg(color.green(), 2, 16, QChar('0'))
-             .arg(color.blue(),  2, 16, QChar('0'))
-             .arg(color.alpha(), 2, 16, QChar('0')));
-    return s;
-}
-
 
 void Preferences::readSettings()
 {
     QSettings s;
-    for (QString key : colors.keys()) {
-        colors.insert(key, fromHex(s.value(key, toHex(colors[key])).toString()));
-    }
-    for (QString key : doubles.keys()) {
-        doubles.insert(key, s.value(key, doubles[key]).toDouble());
+    for (QString key : _attributes.keys()) {
+        Attribute* a = _attributes[key];
+        QString code = s.value(key, QVariant()).toString();
+        if (!code.isEmpty()) {
+            a->fromString(code);
+        }
     }
 }
 
 void Preferences::writeSettings()
 {
     QSettings s;
-    for (QString key : colors.keys()) {
-        s.setValue(key, toHex(colors[key]));
-    }
-    for (QString key : doubles.keys()) {
-        s.setValue(key, doubles[key]);
+    for (QString key : _attributes.keys()) {
+        s.setValue(key, _attributes[key]->toString());
     }
 }

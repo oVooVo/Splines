@@ -18,9 +18,13 @@ ColorButton::ColorButton(QWidget *parent) :
     });
 }
 
-void ColorButton::paintEvent(QPaintEvent *)
+void ColorButton::paintEvent(QPaintEvent *e)
 {
-    QPainter p(this);
-    p.fillRect(rect(), _color);
+    if (!_multiState) {
+        QPainter p(this);
+        p.fillRect(rect(), _color);
+    } else {
+        QPushButton::paintEvent(e);
+    }
 }
 

@@ -38,6 +38,13 @@ protected:
         Q_UNUSED(stream);
     }
 
+    /*
+     * Encode value in a string to save the data in a human readable format
+     */
+public:
+    virtual void fromString(QString string) = 0;
+    virtual QString toString() const = 0;
+
 signals:
     /**
      * @brief changed is emitted whenever this attribute changes.

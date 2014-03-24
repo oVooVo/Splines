@@ -1,4 +1,5 @@
 #include "typeattribute.h"
+#include <QDebug>
 
 REGISTER_DEFN_TYPE(Attribute, TypeAttribute);
 
@@ -25,4 +26,18 @@ void TypeAttribute::setCurrentIndex(int ind)
     Q_ASSERT_X(ind < _types.size() && ind >= 0, "TypeAttribute::setCurrentIndex", "invalid index");
     _currentIndex = ind;
     emit changed();
+}
+
+QString TypeAttribute::toString() const
+{
+    return QString("%1").arg(currentIndex());
+}
+
+void TypeAttribute::fromString(QString string)
+{
+    bool ok;
+    setCurrentIndex(string.toInt(&ok));
+    if (!ok) {
+        qWarning() << "cannot parse " << string;
+    }
 }

@@ -112,3 +112,34 @@ void TransformationAttribute::setValue(QTransform t)
 
 }
 
+void TransformationAttribute::fromString(QString string)
+{
+    QStringList tokens = string.split(",");
+    QMap<QString, double> map;
+    for (QString token : tokens) {
+        QStringList keyValue = token.split(":");
+        bool ok;
+        map.insert(keyValue[0].trimmed(), keyValue[1].trimmed().toDouble(&ok));
+        if (!ok) {
+            qWarning() << "cannot parse " << token;
+        }
+    }
+    for (QString key : map.keys()) {
+        if (key == "x")  { setX (map[key]); }
+        if (key == "y")  { setY (map[key]); }
+        if (key == "sx") { setSX(map[key]); }
+        if (key == "sy") { setSY(map[key]); }
+        if (key == "r")  { setR (map[key]); }
+    }
+}
+
+QString TransformationAttribute::toString() const
+{
+    return QString("x: %1, y: %2, sx: %3, sy: %4, r: %5")
+            .arg(x())
+            .arg(y())
+            .arg(sx())
+            .arg(sy())
+            .arg(r());
+}
+

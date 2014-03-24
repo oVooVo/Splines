@@ -12,6 +12,8 @@ public:
     int currentIndex() const { return _currentIndex; }
     QString currentText() const;
     QStringList types() const { return _types; }
+    QString toString() const;
+    void fromString(QString string);
 
 public slots:
     void setCurrentIndex(int ind);

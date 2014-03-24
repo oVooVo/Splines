@@ -19,3 +19,17 @@ void BoolAttribute::setValue(bool value)
     _value = value;
     emit changed();
 }
+
+QString BoolAttribute::toString() const
+{
+    return _value ? "true" : "false";
+}
+
+void BoolAttribute::fromString(QString string)
+{
+    if (string.toUpper() == QString("true").toUpper()) {
+        setValue(true);
+    } else {
+        setValue(false);
+    }
+}

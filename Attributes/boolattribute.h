@@ -9,6 +9,9 @@ class BoolAttribute : public Attribute
 public:
     BoolAttribute(QString label = "Label: ", bool value = false);
     bool value() const { return _value != 0; }
+    void fromString(QString string);
+    QString toString() const;
+
 public slots:
     void setValue(bool value);
 

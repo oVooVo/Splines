@@ -20,3 +20,13 @@ void StringAttribute::registerAttributeData(QDataStream &stream, Direction direc
 {
     REGISTER_DATA(_string)
 }
+
+void StringAttribute::fromString(QString string)
+{
+    setString(string);
+}
+
+QString StringAttribute::toString() const
+{
+    return string();
+}

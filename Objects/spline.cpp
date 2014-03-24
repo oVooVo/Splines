@@ -11,6 +11,7 @@
 #include "Spline/cubicpiece.h"
 #include "preferences.h"
 #include <QVector4D>
+#include "Attributes/colorattribute.h"
 
 
 REGISTER_DEFN_TYPE(Object, Spline);
@@ -118,11 +119,11 @@ void Spline::drawIndividual(QPainter &painter)
         if (isSelected())
             painter.setPen(
                         lerp(
-                            Preferences::colors["Spline.active.start"],
-                            Preferences::colors["Spline.active.end"],
+                            Preferences::value<ColorAttribute>("colors.spline.active.start")->color(),
+                            Preferences::value<ColorAttribute>("colors.spline.active.end")->color(),
                             (double) i / n
                     ));
-        else painter.setPen(Preferences::colors["Spline.inactive"]);
+        else painter.setPen(Preferences::value<ColorAttribute>("colors.spline.inactive")->color());
         painter.drawLine(at(i/(n + 1.0)), at((i+1.0)/(n+1.0)));
     }
     for (Point* p : points()) {

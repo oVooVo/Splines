@@ -55,7 +55,11 @@ SOURCES += main.cpp\
     preferences.cpp \
     gradient.cpp \
     colorbutton.cpp \
-    preferencedialog.cpp
+    preferencedialog.cpp \
+    Attributes/colorattribute.cpp \
+    Attributes/doubleattribute.cpp \
+    AttributeWidgets/colorwidget.cpp \
+    AttributeWidgets/doublewidget.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -100,7 +104,11 @@ HEADERS  += mainwindow.h \
     preferences.h \
     gradient.h \
     colorbutton.h \
-    preferencedialog.h
+    preferencedialog.h \
+    Attributes/colorattribute.h \
+    Attributes/doubleattribute.h \
+    AttributeWidgets/colorwidget.h \
+    AttributeWidgets/doublewidget.h
 
 
 FORMS    += mainwindow.ui \
@@ -108,4 +116,6 @@ FORMS    += mainwindow.ui \
     AttributeWidgets/stringwidget.ui \
     AttributeWidgets/typewidget.ui \
     Dialogs/pointeditdialog.ui \
-    preferencedialog.ui
+    preferencedialog.ui \
+    AttributeWidgets/colorwidget.ui \
+    AttributeWidgets/doublewidget.ui
