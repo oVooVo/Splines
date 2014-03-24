@@ -8,10 +8,12 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
 {
     connect(this, SIGNAL(accepted()), this, SLOT(on_accept()));
     createUi();
+    Preferences::readSettings();
 }
 
 PreferenceDialog::~PreferenceDialog()
 {
+    Preferences::writeSettings();
 }
 
 void PreferenceDialog::createUi()
