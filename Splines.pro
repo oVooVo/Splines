@@ -59,7 +59,8 @@ SOURCES += main.cpp\
     Attributes/colorattribute.cpp \
     Attributes/doubleattribute.cpp \
     AttributeWidgets/colorwidget.cpp \
-    AttributeWidgets/doublewidget.cpp
+    AttributeWidgets/doublewidget.cpp \
+    Tools/deletepointtool.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
@@ -108,7 +109,8 @@ HEADERS  += mainwindow.h \
     Attributes/colorattribute.h \
     Attributes/doubleattribute.h \
     AttributeWidgets/colorwidget.h \
-    AttributeWidgets/doublewidget.h
+    AttributeWidgets/doublewidget.h \
+    Tools/deletepointtool.h
 
 
 FORMS    += mainwindow.ui \

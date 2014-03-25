@@ -93,7 +93,7 @@
 // (2)
 #define REGISTERER(CLASSNAME)                                                    \
 class CLASSNAME;                                                                 \
-template<typename T> CLASSNAME *create##CLASSNAME() { return new T(); }          \
+ template<typename T> CLASSNAME *create##CLASSNAME() { return new T(); }          \
 template<typename T>                                                             \
 struct CLASSNAME##Register                                                       \
 {                                                                                \

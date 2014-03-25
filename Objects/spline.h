@@ -10,7 +10,7 @@ class Spline : public PointObject
 {
     Q_OBJECT
 public:
-    enum Type { Linear, Cubic, BSpline, Bezier, Invalid };
+    enum Type { Linear, Bezier, BSpline, Cubic, Invalid };
     Spline(Object* parent = 0);
     QPointF operator() (double t) const { return at(t); }
     QPointF at(double t) const;

@@ -131,10 +131,18 @@ Point* PointObject::selectTangentAt(const QPointF pos) const
     return pointWithTangent;
 }
 
-
-
-
-
+void PointObject::deleteSelectedPoints()
+{
+    bool haschanged = false;
+    for (Point* p : selection()) {
+        deselectPoint(p);
+        _points.removeOne(p);
+        delete p;
+        haschanged = true;
+    }
+    if (haschanged)
+        emit changed();
+}
 
 
 

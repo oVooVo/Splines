@@ -27,6 +27,7 @@ public:
     void selectPoint(Point* p);
     void deselectPoint(Point* p);
     void toggleSelectionOfPoint(Point* p);
+    void deleteSelectedPoints();
     Point* pointAt(const QPointF pos) const;
     Point* selectTangentAt(const QPointF pos) const;
 

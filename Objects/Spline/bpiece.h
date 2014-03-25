@@ -7,8 +7,8 @@
 class BPiece : public SplinePiece
 {
 public:
-    enum Type { Start, End, Middle };
-    BPiece(Point* a, Point* b, Point* c, Point* d = 0, Type type = Middle);
+    enum Type { Start, End, Middle, Bezier };
+    BPiece(Point* a, Point* b, Point* c, Point* d, Type type = Middle);
     QPointF operator ()(double t) const;
 
 private:

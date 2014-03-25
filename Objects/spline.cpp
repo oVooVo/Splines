@@ -19,7 +19,7 @@ REGISTER_DEFN_TYPE(Object, Spline);
 Spline::Spline(Object *parent) : PointObject(parent)
 {
     QStringList splineTypes;
-    splineTypes << "Linear" << "Bezier";
+    splineTypes << "Linear" << "Bezier" << "B-Spline";
     addAttribute("SplineType", new TypeAttribute("Spline type:", splineTypes));
     addAttribute("Closed", new BoolAttribute("Closed", false));
 }
@@ -53,7 +53,7 @@ int Spline::segments() const
     case BSpline:
     case Cubic:
         if (isClosed()) {
-            return 0;
+            return n;
         } else {
             if (n < 2) return 0;
             if (n == 2) return 1;
@@ -75,6 +75,9 @@ QPointF Spline::at(double t) const
 
     int a = segment(t) % points().size();
     int b = (a+1) % points().size();
+    int c = (a+2) % points().size();
+    int d = (a+3) % points().size();
+
 
     switch (type()) {
     case Linear:
@@ -82,6 +85,27 @@ QPointF Spline::at(double t) const
     case Bezier:
         return BezierPiece(points()[a], points()[b])(u);
     case BSpline:
+        if (isClosed()) {
+            return BPiece(points()[a], points()[b], points()[c], points()[d], BPiece::Middle)(u);
+        } else {
+            if (points().size() > 4) {
+                if (a == 0)
+                    return BPiece(points()[a], points()[b], points()[c], points()[d], BPiece::Start)(u);
+                else if (d == segments() + 2)
+                    return BPiece(points()[a], points()[b], points()[c], points()[d], BPiece::End)(u);
+                else
+                    return BPiece(points()[a], points()[b], points()[c], points()[d], BPiece::Middle)(u);
+            } else if (points().size() == 4) {
+                return BPiece(points()[a], points()[b], points()[c], points()[d], BPiece::Bezier)(u);
+            } else if (points().size() == 3) {
+                return BPiece(points()[a], points()[b], points()[c], 0, BPiece::Bezier)(u);
+            } else if (points().size() == 2) {
+                return LinearPiece(points()[a], points()[b])(u);
+            } else {
+                //never reached
+                return QPointF();
+            }
+        }
     case Cubic:
     case Invalid:
     default:
@@ -95,8 +119,8 @@ Spline::Type Spline::type() const
     switch (((TypeAttribute*) attributes()["SplineType"])->currentIndex()) {
     case 0: return Spline::Linear;
     case 1: return Spline::Bezier;
-    case 2: return Spline::Cubic;
-    case 3: return Spline::BSpline;
+    case 2: return Spline::BSpline;
+    case 3: return Spline::Cubic;
     default: return Invalid;
     }
 }
