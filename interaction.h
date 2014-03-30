@@ -35,7 +35,7 @@ public:
     QPointF point() const {
         return _point;
     }
-    Type type() {
+    Type type() const {
         return _type;
     }
     bool isValid() const { return _type != Invalid; }

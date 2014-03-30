@@ -24,6 +24,8 @@ void TypeAttribute::setCurrentIndex(int ind)
     if (_currentIndex == ind) return;
 
     Q_ASSERT_X(ind < _types.size() && ind >= 0, "TypeAttribute::setCurrentIndex", "invalid index");
+
+    beforeChange();
     _currentIndex = ind;
     emit changed();
 }

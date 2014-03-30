@@ -12,6 +12,7 @@ void StringAttribute::setString(const QString &string)
 {
     if (string == _string) return;
 
+    beforeChange();
     _string = string;
     emit changed();
 }

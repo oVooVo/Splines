@@ -16,6 +16,8 @@ void BoolAttribute::setValue(bool value)
 {
     if (value == _value) return;
 
+    beforeChange();
+
     _value = value;
     emit changed();
 }

@@ -27,6 +27,7 @@ void Object::deserialize(QDataStream &stream)
     qDeleteAll(_attributes);
     stream >> _attributes;
     for (Attribute* a : _attributes) {
+        a->setObject(this);
         connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
     }
 
@@ -269,6 +270,7 @@ QStringList Object::attributeKeys(QString classname)
 void Object::addAttribute(QString key, Attribute *a)
 {
     Q_ASSERT_X(!_attributes.contains(key), "Object::addAttribute", "Multiple key");
+    a->setObject(this);
     _attributes.insert(key, a);
     connect(a, SIGNAL(changed()), this, SIGNAL(changed()));
 }

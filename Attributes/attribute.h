@@ -3,6 +3,8 @@
 
 #include "register_defines.h"
 
+class Object;
+
 /**
  * @brief The Attribute class provides an interface for Attributes. They can be serialized and deserialized
  *  in an easy way. Derived Attributes should be registered as told in register_defines.h
@@ -38,12 +40,16 @@ protected:
         Q_UNUSED(stream);
     }
 
+    void beforeChange();
+    void blockSnapshot(bool b);
+
     /*
      * Encode value in a string to save the data in a human readable format
      */
 public:
     virtual void fromString(QString string) = 0;
     virtual QString toString() const = 0;
+    void setObject(Object* o) { _object = o; }
 
 signals:
     /**
@@ -57,6 +63,8 @@ signals:
 private:
     // every attribute has a label representing the role of the value.
     QString _label;
+    Object* _object = 0;
+    bool _snapshotsBlocked = false;
 public:
     QString label() const { return _label; }
 

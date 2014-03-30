@@ -39,6 +39,8 @@ QTransform TransformationAttribute::value() const
 void TransformationAttribute::setX(double x)
 {
     if (_x == x) return;
+
+    beforeChange();
     _x = x;
     emit xChanged(_x);
 }
@@ -46,6 +48,8 @@ void TransformationAttribute::setX(double x)
 void TransformationAttribute::setY(double y)
 {
     if (_y == y) return;
+
+    beforeChange();
     _y = y;
     emit yChanged(_y);
 }
@@ -53,6 +57,8 @@ void TransformationAttribute::setY(double y)
 void TransformationAttribute::setSX(double sx)
 {
     if (_sx == sx) return;
+
+    beforeChange();
     _sx = sx;
     emit sxChanged(_sx);
 }
@@ -60,6 +66,8 @@ void TransformationAttribute::setSX(double sx)
 void TransformationAttribute::setSY(double sy)
 {
     if (_sy == sy) return;
+
+    beforeChange();
     _sy = sy;
     emit syChanged(_sy);
 }
@@ -68,6 +76,8 @@ void TransformationAttribute::setR(double r)
 {
     r *= M_PI / 180.0;
     if (_r == r) return;
+
+    beforeChange();
     _r = r;
     emit rChanged(_r);
 }
@@ -87,6 +97,8 @@ double TransformationAttribute::value(Key k) const
 
 void TransformationAttribute::setValue(QTransform t)
 {
+
+    beforeChange();
     double m11 = t.m11();
     double m12 = t.m12();
     double m21 = t.m21();
@@ -114,6 +126,7 @@ void TransformationAttribute::setValue(QTransform t)
 
 void TransformationAttribute::fromString(QString string)
 {
+
     QStringList tokens = string.split(",");
     QMap<QString, double> map;
     for (QString token : tokens) {
@@ -124,6 +137,9 @@ void TransformationAttribute::fromString(QString string)
             qWarning() << "cannot parse " << token;
         }
     }
+
+    beforeChange();
+    blockSnapshot(true);
     for (QString key : map.keys()) {
         if (key == "x")  { setX (map[key]); }
         if (key == "y")  { setY (map[key]); }
@@ -131,6 +147,7 @@ void TransformationAttribute::fromString(QString string)
         if (key == "sy") { setSY(map[key]); }
         if (key == "r")  { setR (map[key]); }
     }
+    blockSnapshot(false);
 }
 
 QString TransformationAttribute::toString() const

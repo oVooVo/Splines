@@ -14,6 +14,7 @@
 #include <QStack>
 
 class Manager;
+class UndoHandler;
 class Scene : public QAbstractItemModel
 {
     Q_OBJECT
@@ -143,8 +144,11 @@ public slots:
      *   this function does nothing more than forwarding take-snapshot-signal.
      */
     void takeSnapshot();
-signals:
-    void snapshotRequest();
+public:
+    void setUndoHandler(UndoHandler* uh) { _undoHandler = uh; }
+private:
+    UndoHandler* _undoHandler;
+    bool _moveSnapShotted = false;
 
 
 private:

@@ -30,9 +30,9 @@ public:
     virtual QString actionText() const { return QString(metaObject()->className()); }
     virtual QString toolTip() const { return QString(); }
     virtual QIcon icon() const { return QIcon(); }
+    virtual bool canPerform(const Object* o) const = 0;
 
 protected:
-    virtual bool canPerform(const Object* o) const = 0;
     virtual void perform_virtual(Object* o) = 0;
 
 

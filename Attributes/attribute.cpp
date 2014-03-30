@@ -1,5 +1,7 @@
 #include "attribute.h"
 #include <QDebug>
+#include "Objects/object.h"
+#include "scene.h"
 
 INIT_CREATOR_MAP(Attribute);
 
@@ -30,5 +32,18 @@ QDataStream& operator>>(QDataStream& in, Attribute* &a)
     a->registerAttributeData(in, Attribute::Deserialize);
 
     return in;
+}
+
+void Attribute::blockSnapshot(bool b)
+{
+    _snapshotsBlocked = b;
+}
+
+void Attribute::beforeChange()
+{
+    if (_snapshotsBlocked) return;
+
+    _object->scene()->takeSnapshot();
+
 }
 

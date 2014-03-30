@@ -6,7 +6,7 @@
 #include "Tools/newpointtool.h"
 #include "Managers/manager.h"
 #include "Managers/dockablemanager.h"
-#include <QTimer>
+#include "undohandler.h"
 
 QList<QModelIndex> Scene::_draggedObjects;
 
@@ -27,6 +27,8 @@ Scene::~Scene()
 
 void Scene::addObject(Object *o)
 {
+    takeSnapshot();
+
     attachId(o);
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
@@ -38,8 +40,11 @@ void Scene::removeObject(QModelIndex index)
 {
     Q_ASSERT_X(index.isValid(), "Scene::removeObject", "Trying to delete root or indexless object");
     Object* o = getObject(index);
-    beginRemoveRows(index.parent(), o->row(), o->row());
+    if (!o) return;
 
+    takeSnapshot();
+
+    beginRemoveRows(index.parent(), o->row(), o->row());
     _objects.remove(o->id());
     delete o;
     endRemoveRows();
@@ -283,13 +288,20 @@ void Scene::processInteraction(const Interaction &interaction)
 {
     if (!_tool) return;
 
-    _tool->config(interaction);
+    _tool->config(interaction); // can be configured without caring about snapshots since tool's status isnt serialized in snapshot of scene.
+
     bool anythingPerformed = false;
     for (Object* o : selectedObjects()) {
-        anythingPerformed |= _tool->perform(o);
+        anythingPerformed |= _tool->canPerform(o);
     }
-    if (anythingPerformed)
-        emit snapshotRequest();
+
+    if (anythingPerformed && interaction.type() == Interaction::Press) {
+        takeSnapshot();
+    }
+
+    for (Object* o : selectedObjects()) {
+        _tool->perform(o);
+    }
 }
 
 void Scene::setTool(Tool *tool)
@@ -412,9 +424,8 @@ bool Scene::isSelected(Object *o)
 
 void Scene::takeSnapshot()
 {
-    emit snapshotRequest();
+    _undoHandler->takeSnapshot();
 }
-
 
 void Scene::select(Object *o, bool s)
 {

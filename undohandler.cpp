@@ -28,9 +28,7 @@ void UndoHandler::takeSnapshot()
     if (!_currentScene) return;
 
     clearRedos();
-    if (!_undoBuffer.isEmpty())
-        _undoStack.push(_undoBuffer);
-    _undoBuffer = saveScene(_currentScene);
+    _undoStack.push(saveScene(_currentScene));
     emit canUndo(true);
 }
 
@@ -39,24 +37,24 @@ void UndoHandler::setScene(Scene* scene)
     if (_currentScene == scene) return;
 
     _currentScene = scene;
+    _currentScene->setUndoHandler(this);
     clearRedos();
     clearUndos();
 
-    if (_currentScene)
-        connect(_currentScene, SIGNAL(snapshotRequest()), this, SLOT(takeSnapshot()));
+    if (_currentScene) {
+        takeSnapshot();
+    }
 }
 
 void UndoHandler::undo()
 {
     if (_undoStack.isEmpty()) return;
 
-    _undoBuffer.clear();
-
     _redoStack.push(saveScene(_currentScene));
     emit canRedo(true);
 
     _currentScene = readScene(_undoStack.pop());
-    connect(_currentScene, SIGNAL(snapshotRequest()), this, SLOT(takeSnapshot()));
+    _currentScene->setUndoHandler(this);
 
     emit currentSceneChanged(_currentScene);
 
@@ -68,13 +66,11 @@ void UndoHandler::redo()
 {
     if (_redoStack.isEmpty()) return;
 
-    _undoBuffer.clear();
-
     _undoStack.push(saveScene(_currentScene));
     emit canUndo(true);
 
     _currentScene = readScene(_redoStack.pop());
-    connect(_currentScene, SIGNAL(snapshotRequest()), this, SLOT(takeSnapshot()));
+    _currentScene->setUndoHandler(this);
 
     emit currentSceneChanged(_currentScene);
 
@@ -96,4 +92,12 @@ void UndoHandler::clearUndos()
 
     _undoStack.clear();
     emit canUndo(false);
+}
+
+void UndoHandler::discardLastSnapshot()
+{
+    if (_undoStack.isEmpty()) return;
+
+    _undoStack.pop();
+    emit canUndo(_undoStack.isEmpty());
 }

@@ -25,6 +25,7 @@ void DoubleAttribute::setValue(double v)
 {
     if (_value == v) return;
 
+    beforeChange();
     _value = v;
     emit changed();
 }

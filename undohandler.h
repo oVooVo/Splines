@@ -17,6 +17,7 @@ public:
     Scene* scene() const { return _currentScene; }
     void clearUndos();
     void clearRedos();
+    void discardLastSnapshot();
 
 
 public slots:
@@ -30,7 +31,6 @@ signals:
     void currentSceneChanged(Scene* scene);
 
 private:
-    QByteArray _undoBuffer;     // when undo, the last snapshot will be restored, not the current!
     QStack<QByteArray> _undoStack;
     QStack<QByteArray> _redoStack;
     Scene* _currentScene = 0;
