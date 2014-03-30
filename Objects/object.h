@@ -11,7 +11,7 @@
 #include "action.h"
 #include "register_defines.h"
 
-
+class Scene;
 class Object : public QObject, public Action
 {
     Q_OBJECT
@@ -185,7 +185,7 @@ public:
      * @brief setId sets the id of this object. The id can only be set once!
      * @param id the new id of this object.
      */
-    void setId(quint64 id);
+    void setId(quint64 id, Scene *scene);
 
     /**
      * @brief id returns the id of this object.
@@ -198,6 +198,7 @@ public:
      * @return a list of ids of all descendants
      */
     QList<quint64> idsOfAllDescendants() const;
+    QList<Object*> descendants();
 
 private:
     /**
@@ -303,7 +304,19 @@ public:
 private:
     bool _isSelected = false;
 
+    //----------------------------------
+    //
+    // Indexes
+    //
+    //------------------------
+public:
+    QModelIndex index();
 
+
+public:
+    Scene* scene() const { return _scene; }
+private:
+    Scene* _scene;
 
 
 signals:

@@ -3,13 +3,15 @@
 
 #include "scene.h"
 #include <QWidget>
+#include "manager.h"
 
-class Viewport : public QWidget
+
+//in the long term viewport should derive AbstractManager!
+class Viewport : public QWidget, public Manager
 {
 public:
     Viewport(QWidget* parent = 0);
-    void setScene(Scene* scene);
-    Scene* scene() const { return _scene; }
+    void setScene(Scene* s);
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -19,7 +21,6 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
 private:
-    Scene* _scene = 0;
     QPointF _lastMousePos;
     QTransform _globaleTransformation;
     QPointF map(QPointF p) const;

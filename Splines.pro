@@ -17,7 +17,7 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     point.cpp \
     scene.cpp \
-    viewport.cpp \
+    Managers/viewport.cpp \
     testobject.cpp \
     interaction.cpp \
     Attributes/attribute.cpp \
@@ -35,7 +35,6 @@ SOURCES += main.cpp\
     Objects/Spline/bezierpiece.cpp \
     Objects/root.cpp \
     Managers/attributemanager.cpp \
-    Managers/manager.cpp \
     Managers/objectmanager.cpp \
     Tools/tool.cpp \
     Tools/newpointtool.cpp \
@@ -60,12 +59,16 @@ SOURCES += main.cpp\
     Attributes/doubleattribute.cpp \
     AttributeWidgets/colorwidget.cpp \
     AttributeWidgets/doublewidget.cpp \
-    Tools/deletepointtool.cpp
+    Tools/deletepointtool.cpp \
+    undohandler.cpp \
+    Managers/statusbar.cpp \
+    Managers/dockablemanager.cpp \
+    Managers/manager.cpp
 
 HEADERS  += mainwindow.h \
     point.h \
     scene.h \
-    viewport.h \
+    Managers/viewport.h \
     testobject.h \
     interaction.h \
     action.h \
@@ -84,7 +87,6 @@ HEADERS  += mainwindow.h \
     Objects/Spline/bezierpiece.h \
     Objects/root.h \
     Managers/attributemanager.h \
-    Managers/manager.h \
     Managers/objectmanager.h \
     Tools/tool.h \
     Tools/newpointtool.h \
@@ -110,7 +112,11 @@ HEADERS  += mainwindow.h \
     Attributes/doubleattribute.h \
     AttributeWidgets/colorwidget.h \
     AttributeWidgets/doublewidget.h \
-    Tools/deletepointtool.h
+    Tools/deletepointtool.h \
+    undohandler.h \
+    Managers/statusbar.h \
+    Managers/dockablemanager.h \
+    Managers/manager.h
 
 
 FORMS    += mainwindow.ui \

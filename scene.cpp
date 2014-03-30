@@ -5,6 +5,8 @@
 #include <QMimeData>
 #include "Tools/newpointtool.h"
 #include "Managers/manager.h"
+#include "Managers/dockablemanager.h"
+#include <QTimer>
 
 QList<QModelIndex> Scene::_draggedObjects;
 
@@ -25,8 +27,7 @@ Scene::~Scene()
 
 void Scene::addObject(Object *o)
 {
-    o->setId(requestId());
-    _objects.insert(o->id(), o);
+    attachId(o);
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
     endInsertRows();
@@ -39,8 +40,7 @@ void Scene::removeObject(QModelIndex index)
     Object* o = getObject(index);
     beginRemoveRows(index.parent(), o->row(), o->row());
 
-    for (quint64 id : o->idsOfAllDescendants())
-        _freeIds.enqueue(id);
+    _objects.remove(o->id());
     delete o;
     endRemoveRows();
     emit changed();
@@ -231,47 +231,52 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
     QByteArray encodedObject = data->data("application/Object");
     QDataStream stream(&encodedObject, QIODevice::ReadOnly);
     stream >> dropped;
-    for (Object* o : dropped) {
-        if (action == Qt::CopyAction) {
-            o->setId(requestId());
-        }
-        insertRow(row, parent, o);
-    }
     if (action == Qt::MoveAction) {
         for (QModelIndex i : _draggedObjects)
             removeObject(i);
     }
     for (Object* o : dropped) {
-        _freeIds.removeOne(o->id());
+        if (action == Qt::CopyAction) {
+            attachId(o);
+        } else {
+            for (Object* desc : o->descendants()) {
+                _objects.insert(desc->id(), desc);
+            }
+        }
+        insertRow(row, parent, o);
     }
+
     emit changed();
     return false;
 }
 
-quint64 Scene::requestId()
+void Scene::attachId(Object* o)
 {
-    if (_freeIds.isEmpty()) {
-        return _objectCounter++;
-    } else {
-        return _freeIds.dequeue();
-    }
+    Q_ASSERT(_objectCounter < std::numeric_limits<quint64>::max());
+
+    o->setId(_objectCounter, this);
+    _objects.insert(o->id(), o);
+    _objectCounter++;
 }
 
 QList<Object*> Scene::selectedObjects()
 {
     if (!_selectionUpToDate) {
-        for (Object* o : _selection) {
-            o->deselect();
-        }
-        _selection.clear();
-        for (QModelIndex index : selectionModel()->selection().indexes()) {
-            Object* o = getObject(index);
-            o->select();
-            _selection << o;
-        }
+        _selection = selectedObjectsConst();
         _selectionUpToDate = true;
     }
     return _selection;
+}
+
+QList<Object*> Scene::selectedObjectsConst() const
+{
+    QList<Object*> selection;
+    for (QModelIndex index : selectionModel()->selection().indexes()) {
+        Object* o = getObject(index);
+        o->select();
+        selection << o;
+    }
+    return selection;
 }
 
 void Scene::processInteraction(const Interaction &interaction)
@@ -279,10 +284,12 @@ void Scene::processInteraction(const Interaction &interaction)
     if (!_tool) return;
 
     _tool->config(interaction);
+    bool anythingPerformed = false;
     for (Object* o : selectedObjects()) {
-        _tool->perform(o);
+        anythingPerformed |= _tool->perform(o);
     }
-
+    if (anythingPerformed)
+        emit snapshotRequest();
 }
 
 void Scene::setTool(Tool *tool)
@@ -335,20 +342,36 @@ QDataStream& operator<<(QDataStream& out, const Scene* s)
 {
     Scene::serializeHeader(out);
     out << s->root();
-    out << s->_freeIds << s->_objectCounter;
+    out << s->_objectCounter;
+    QList<quint64> selectedIds;
+    for (Object* o : s->selectedObjectsConst()) {
+        selectedIds.append(o->id());
+    }
+    out << selectedIds;
     return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Scene* &s)
 {
     if (!Scene::deserializeHeader(in)) {
+        qWarning() << "deserializing scene failed.";
         s = 0;
     } else {
         Object* root;
         in >> root;
         Q_ASSERT_X(QString(root->metaObject()->className()) == "Root", "Scene operator>>", "root is not of type Root");
         s = new Scene((Root*) root);
-        in >> s->_freeIds >> s->_objectCounter;
+        in >> s->_objectCounter;
+
+        for (Object* o : root->descendants()) {
+            s->_objects.insert(o->id(), o);
+        }
+
+        QList<quint64> selectedIds;
+        in >> selectedIds;
+        for (quint64 id : selectedIds) {
+            s->select(id);
+        }
     }
     return in;
 }
@@ -387,4 +410,45 @@ bool Scene::isSelected(Object *o)
     return selectedObjects().contains(o);
 }
 
+void Scene::takeSnapshot()
+{
+    emit snapshotRequest();
+}
 
+
+void Scene::select(Object *o, bool s)
+{
+    if (!o) return;
+
+    QItemSelectionModel::SelectionFlag flag = s ? QItemSelectionModel::Select : QItemSelectionModel::Deselect;
+    if (o == root()) {
+        selectionModel()->select(QModelIndex(), flag);
+    } else {
+        o->select();
+        selectionModel()->select(index(o), flag);
+    }
+}
+
+void Scene::select(quint64 id, bool s)
+{
+    Object* obj = _objects.value(id, 0);
+    select(obj, s);
+}
+
+QModelIndex Scene::index(Object *object) const
+{
+    if (object == root()) return QModelIndex();
+
+    QModelIndex ind = index(object->row(), 0, index(object->parent()));
+    return ind;
+}
+
+Object* Scene::object(const QModelIndex &index) const
+{
+    return (Object*) index.internalPointer();
+}
+
+Object* Scene::object(const quint64 id) const
+{
+    return _objects.value(id, 0);
+}

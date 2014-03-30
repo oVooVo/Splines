@@ -20,7 +20,7 @@ class Tool : public QObject, public Action
 public:
     Tool();
 
-    void perform(Object* o);
+    bool perform(Object* o);
     void setParentWidget(QWidget* widget) { _parentWidget = widget; }
     QWidget* parentWidget() const { return _parentWidget; }
     void config(const Interaction &interaction);

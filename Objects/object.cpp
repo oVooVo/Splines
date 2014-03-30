@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QMetaObject>
 #include "Attributes/stringattribute.h"
+#include <QModelIndex>
+#include "scene.h"
 
 
 INIT_CREATOR_MAP(Object);
@@ -50,11 +52,12 @@ Object::~Object()
     qDeleteAll(_attributes);
 }
 
-void Object::setId(quint64 id)
+void Object::setId(quint64 id, Scene* scene)
 {
     Q_ASSERT_X(!_id_set_by_user, "Object::setId", "Trying to set ID twice");
     _id_set_by_user = true;
     _id = id;
+    _scene = scene;
     setName(genericName());
 }
 
@@ -279,6 +282,15 @@ QList<quint64> Object::idsOfAllDescendants() const
     return list;
 }
 
+QList<Object*> Object::descendants()
+{
+    QList<Object*> list;
+    list << this;
+    for (Object* o : children())
+        list << o->descendants();
+    return list;
+}
+
 void Object::emitChanged()
 {
     emit changed();
@@ -312,4 +324,12 @@ QDataStream& operator>>(QDataStream& stream, Object* &o)
         Q_ASSERT_X(o, "Object::deserialize", "deserialization failed.");
     }
     return stream;
+}
+
+QModelIndex Object::index()
+{
+    if (!parent())
+        return scene()->createIndex(0, 0, this);
+
+    return parent()->index().child(row(), 0);
 }

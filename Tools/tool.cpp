@@ -11,10 +11,13 @@ void Tool::config(const Interaction &interaction)
     _interaction = interaction;
 }
 
-void Tool::perform(Object *o)
+bool Tool::perform(Object *o)
 {
-    if (canPerform(o))
+    if (canPerform(o)) {
         perform_virtual(o);
+        return true;
+    }
+    return false;
 }
 
 Interaction Tool::interaction(Object *o) const

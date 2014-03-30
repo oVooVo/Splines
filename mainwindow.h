@@ -4,10 +4,11 @@
 #include <QMainWindow>
 
 #include "scene.h"
-#include "viewport.h"
+#include "Managers/viewport.h"
 #include "Objects/spline.h"
 #include <QActionGroup>
 #include "Managers/manager.h"
+#include "undohandler.h"
 
 
 namespace Ui {
@@ -21,6 +22,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+public slots:
     void setScene(Scene* scene);
 
 
@@ -40,11 +43,12 @@ protected:
 private:
     Ui::MainWindow *ui;
     Scene* _scene = 0;
+    UndoHandler* _undoHandler;
     QString _filepath;
     QString fileDialogDirectory() const;
     void updateWindowTitle();
 
-    void addManager(Manager* manager, bool floating = true);
+    void addManager(Manager *manager);
 
     /**
      * @brief createMenu creates a Menu out of Registered classes

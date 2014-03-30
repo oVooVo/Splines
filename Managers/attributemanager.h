@@ -6,9 +6,9 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include "AttributeWidgets/attributewidget.h"
-#include "manager.h"
+#include "dockablemanager.h"
 
-class AttributeManager : public Manager
+class AttributeManager : public DockableManager
 {
     Q_OBJECT
 public:
@@ -21,7 +21,7 @@ private:
     QList<QWidget *> getWidgets(QList<Object*> objects);
     QScrollArea* _scrollArea;
     QWidget* _widget = 0;
-    REGISTER_DECL_MANAGAERTYPE(AttributeManager);
+    REGISTER_DECL_DOCKABLEMANAGERTYPE(AttributeManager);
 
 };
 

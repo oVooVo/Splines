@@ -11,6 +11,7 @@
 #include <QItemSelectionModel>
 #include "interaction.h"
 #include "Tools/tool.h"
+#include <QStack>
 
 class Manager;
 class Scene : public QAbstractItemModel
@@ -31,8 +32,7 @@ public:
 private:
     Root* _root;
     quint64 _objectCounter = 0;
-    QQueue<quint64> _freeIds;
-    quint64 requestId();
+    void attachId(Object *o);
     QHash<quint64, Object*> _objects;
 
     //------------
@@ -95,7 +95,23 @@ private:
 public:
     QItemSelectionModel* selectionModel() const { return _selectionModel; }
     QList<Object*> selectedObjects();
+
+    /**
+     * @brief selectedObjectsConst same as selectedObjectsConst but slower and const because this function does not uses caching.
+     * @return selected objects
+     */
+    QList<Object*> selectedObjectsConst() const;
+
     bool isSelected(Object* o);
+    void select(quint64 id, bool s = true);
+    void select(Object* o, bool s = true);
+    Object* object(const QModelIndex& index) const;
+    Object* object(const quint64 id) const;
+    QModelIndex index(Object *object) const;
+    QModelIndex createIndex(int row, int column, void *data) const {
+        return QAbstractItemModel::createIndex(row, column, data);
+    }
+
 private:
     QItemSelectionModel* _selectionModel = 0;
     bool _selectionUpToDate = false;
@@ -105,7 +121,7 @@ private:
     //
     // Manager
     //
-    //------------------------
+    //-------------------------
 public:
     void addManager(Manager* m);
     void removeManager(Manager* m);
@@ -116,14 +132,26 @@ private slots:
     void on_selectionChanged();
     void on_sceneChanged();
 
+    //-------------------
+    //
+    // Snapshots
+    //
+    //--------------------
+public slots:
+    /**
+     * @brief takeSnapshot convientiently memberfunction of scene although functionality is implemented in UndoHandler.
+     *   this function does nothing more than forwarding take-snapshot-signal.
+     */
+    void takeSnapshot();
+signals:
+    void snapshotRequest();
+
 
 private:
     static void serializeHeader(QDataStream &out);
     static bool deserializeHeader(QDataStream &in);
     friend QDataStream& operator<<(QDataStream& out, const Scene* s);
     friend QDataStream& operator>>(QDataStream& in, Scene* &s);
-
-
 
 
 };

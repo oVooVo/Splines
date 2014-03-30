@@ -2,10 +2,10 @@
 #include "AttributeWidgets/attributewidget.h"
 #include <QDebug>
 
-REGISTER_DEFN_MANAGAERTYPE(AttributeManager);
+REGISTER_DEFN_DOCKABLEMANAGERTYPE(AttributeManager);
 
 AttributeManager::AttributeManager(QWidget *parent) :
-    Manager(parent)
+    DockableManager(parent)
 {
     _scrollArea = new QScrollArea(this);
     setWidget(_scrollArea);

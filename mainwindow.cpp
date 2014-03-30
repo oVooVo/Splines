@@ -8,9 +8,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QSettings>
-#include <QDebug>
 #include "preferences.h"
 #include "preferencedialog.h"
+#include "Managers/statusbar.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,21 +33,45 @@ MainWindow::MainWindow(QWidget *parent) :
     menuBar()->addMenu(createNewObjectsMenu());
     updateWindowTitle();
 
+    _undoHandler = new UndoHandler(this);
+    connect(_undoHandler, SIGNAL(canRedo(bool)), ui->actionRedo, SLOT(setEnabled(bool)));
+    connect(_undoHandler, SIGNAL(canUndo(bool)), ui->actionUndo, SLOT(setEnabled(bool)));
+    connect(ui->actionRedo, SIGNAL(triggered()), _undoHandler, SLOT(redo()));
+    connect(ui->actionUndo, SIGNAL(triggered()), _undoHandler, SLOT(undo()));
+    ui->actionUndo->setEnabled(false);
+    ui->actionRedo->setEnabled(false);
+    connect(_undoHandler, &UndoHandler::currentSceneChanged, [this](Scene* scene) {
+        setScene(scene);
+        _isSaved = false;
+    });
+
+
     newScene();
 
-    Manager* m;
+    DockableManager* m;
     m = new ObjectManager(this);
-    addManager(m, false);
+    addManager(m);
     addDockWidget(Qt::RightDockWidgetArea, m);
+    m->setFloating(false);
     m->setScene(_scene);
 
     m = new AttributeManager(this);
-    addManager(m, false);
+    addManager(m);
     addDockWidget(Qt::RightDockWidgetArea, m);
+    m->setFloating(false);
     m->setScene(_scene);
+
+    StatusBar* statusBar = new StatusBar(this);
+    addManager(statusBar);
+    statusBar->setScene(_scene);
+    setStatusBar(statusBar);
+
+    addManager(ui->viewport);
 
     Preferences::init();
     Preferences::readSettings();
+
+
 }
 
 MainWindow::~MainWindow()
@@ -95,7 +119,9 @@ bool MainWindow::newScene()
 {
     if (!canDiscard()) return false;
 
-    setScene(new Scene());
+    Scene* newScene = new Scene();
+    setScene(newScene);
+    _undoHandler->setScene(newScene);
     _filepath = "";
 
     updateWindowTitle();
@@ -122,6 +148,7 @@ bool MainWindow::load()
 
     if (scene) {
         setScene(scene);
+        _undoHandler->setScene(scene);
         return true;
     } else {
         QMessageBox::warning(this,
@@ -135,8 +162,6 @@ bool MainWindow::load()
 
 void MainWindow::setScene(Scene *scene)
 {
-    ui->viewport->setScene(scene); //TODO: viewport should be a manager too! (but no QDockWidget...)
-
     if (_scene) {
         for (Manager* manager : _scene->managers()) {
             manager->setScene(scene);
@@ -164,13 +189,10 @@ void MainWindow::setScene(Scene *scene)
     }
 }
 
-void MainWindow::addManager(Manager *manager, bool floating)
+void MainWindow::addManager(Manager *manager)
 {
     if (_scene) {
         manager->setScene(_scene);
-        manager->setParent(this);
-        manager->setFloating(floating);
-        manager->show();
     } else {
         delete manager;
     }
@@ -201,12 +223,15 @@ QMenu* MainWindow::createManagerMenu()
 {
     auto connectAction = [this](const QString& classname, const QAction* action) {
         connect(action, &QAction::triggered, [this, classname]() {
-            Manager* manager = Manager::createInstance(classname);
+            DockableManager* manager = DockableManager::createInstance(classname);
             addManager(manager);
+            manager->setParent(this);
+            manager->setFloating(true);
+            manager->show();
         });
     };
 
-    return createMenu<Manager>(connectAction, "Manager Menu");
+    return createMenu<DockableManager>(connectAction, "Manager Menu");
 }
 
 QMenu* MainWindow::createNewObjectsMenu()

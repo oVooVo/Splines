@@ -11,18 +11,12 @@ Viewport::Viewport(QWidget *parent) : QWidget(parent)
 {
 }
 
-void Viewport::setScene(Scene *scene)
+void Viewport::setScene(Scene *s)
 {
-    if (_scene == scene) return;
+    Manager::setScene(s);
 
-    if (_scene) {
-        disconnect(_scene, 0, this, 0);
-    }
-
-    _scene = scene;
-
-    if (_scene) {
-        connect(_scene, SIGNAL(changed()), this, SLOT(update()));
+    if (scene()) {
+        connect(scene(), SIGNAL(changed()), this, SLOT(update()));
     }
 
     update();
@@ -31,11 +25,11 @@ void Viewport::setScene(Scene *scene)
 void Viewport::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    if (_scene) {
+    if (scene()) {
         painter.fillRect(rect(), Preferences::value<ColorAttribute>("colors.background")->color());
         _globaleTransformation = QTransform::fromTranslate(width()/2, height()/2);
         painter.setTransform(_globaleTransformation);
-        _scene->draw(painter);
+        scene()->draw(painter);
     } else {
         painter.fillRect(rect(), Qt::gray);
     }
@@ -47,7 +41,7 @@ void Viewport::mousePressEvent(QMouseEvent *event)
     _lastMousePos = pos;
 
     Interaction interaction(event->button(), pos, Interaction::Press, Interaction::SingleClick, event->modifiers());
-    if (_scene) _scene->processInteraction(interaction);
+    if (scene()) scene()->processInteraction(interaction);
 }
 
 void Viewport::mouseMoveEvent(QMouseEvent *event)
@@ -55,7 +49,7 @@ void Viewport::mouseMoveEvent(QMouseEvent *event)
     QPointF pos = map(event->pos());
     QPointF t = pos - _lastMousePos;
     Interaction interaction(t, event->modifiers());
-    if (_scene) _scene->processInteraction(interaction);
+    if (scene()) scene()->processInteraction(interaction);
     _lastMousePos = map(event->pos());
 }
 
@@ -65,7 +59,7 @@ void Viewport::mouseDoubleClickEvent(QMouseEvent *event)
     _lastMousePos = pos;
 
     Interaction interaction(event->button(), pos, Interaction::Press, Interaction::DoubleClick, event->modifiers());
-    if (_scene) _scene->processInteraction(interaction);
+    if (scene()) scene()->processInteraction(interaction);
 }
 
 void Viewport::mouseReleaseEvent(QMouseEvent *event)
@@ -74,7 +68,7 @@ void Viewport::mouseReleaseEvent(QMouseEvent *event)
     _lastMousePos = pos;
 
     Interaction interaction(event->button(), pos, Interaction::Release, Interaction::NoClick, event->modifiers());
-    if (_scene) _scene->processInteraction(interaction);
+    if (scene()) scene()->processInteraction(interaction);
 }
 
 QPointF Viewport::map(QPointF p) const
