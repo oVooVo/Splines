@@ -23,17 +23,21 @@ Scene::Scene(Root *root)
 Scene::~Scene()
 {
     delete _root;
+    if (_tool)
+        delete _tool;
 }
 
 void Scene::addObject(Object *o)
 {
     takeSnapshot();
 
+    blockSnapshots = true;
     attachId(o);
     beginInsertRows(QModelIndex(), _root->childCount(), _root->childCount());
     o->setParent(_root);
     endInsertRows();
     emit changed();
+    blockSnapshots = false;
 }
 
 void Scene::removeObject(QModelIndex index)
@@ -44,11 +48,13 @@ void Scene::removeObject(QModelIndex index)
 
     takeSnapshot();
 
+    blockSnapshots = true;
     beginRemoveRows(index.parent(), o->row(), o->row());
     _objects.remove(o->id());
     delete o;
     endRemoveRows();
     emit changed();
+    blockSnapshots = false;
 }
 
 void Scene::draw(QPainter &painter)
@@ -246,6 +252,7 @@ bool Scene::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, 
         } else {
             for (Object* desc : o->descendants()) {
                 _objects.insert(desc->id(), desc);
+                desc->setScene(this);
             }
         }
         insertRow(row, parent, o);
@@ -264,24 +271,22 @@ void Scene::attachId(Object* o)
     _objectCounter++;
 }
 
-QList<Object*> Scene::selectedObjects()
+QList<Object*> Scene::selectedObjects() const
 {
-    if (!_selectionUpToDate) {
-        _selection = selectedObjectsConst();
-        _selectionUpToDate = true;
-    }
     return _selection;
 }
 
-QList<Object*> Scene::selectedObjectsConst() const
+void Scene::updateSelection()
 {
-    QList<Object*> selection;
+    _selection.clear();
+    for (Object* o : root()->descendants()) {
+        o->deselect();
+    }
     for (QModelIndex index : selectionModel()->selection().indexes()) {
         Object* o = getObject(index);
         o->select();
-        selection << o;
+        _selection << o;
     }
-    return selection;
 }
 
 void Scene::processInteraction(const Interaction &interaction)
@@ -356,7 +361,7 @@ QDataStream& operator<<(QDataStream& out, const Scene* s)
     out << s->root();
     out << s->_objectCounter;
     QList<quint64> selectedIds;
-    for (Object* o : s->selectedObjectsConst()) {
+    for (Object* o : s->selectedObjects()) {
         selectedIds.append(o->id());
     }
     out << selectedIds;
@@ -377,6 +382,7 @@ QDataStream& operator>>(QDataStream& in, Scene* &s)
 
         for (Object* o : root->descendants()) {
             s->_objects.insert(o->id(), o);
+            o->setScene(s);
         }
 
         QList<quint64> selectedIds;
@@ -411,7 +417,7 @@ void Scene::on_sceneChanged()
 
 void Scene::on_selectionChanged()
 {
-    _selectionUpToDate = false;
+    updateSelection();
     for (Manager* m : _managers) {
         m->selectionChanged();
     }
@@ -424,7 +430,9 @@ bool Scene::isSelected(Object *o)
 
 void Scene::takeSnapshot()
 {
-    _undoHandler->takeSnapshot();
+    if (!blockSnapshots) {
+        _undoHandler->takeSnapshot();
+    }
 }
 
 void Scene::select(Object *o, bool s)

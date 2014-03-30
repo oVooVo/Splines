@@ -315,6 +315,7 @@ public:
 
 public:
     Scene* scene() const { return _scene; }
+    void setScene(Scene* s) { _scene = s; }
 private:
     Scene* _scene;
 

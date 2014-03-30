@@ -86,6 +86,7 @@ private:
 public:
     void processInteraction(const Interaction &interaction);
     void setTool(Tool* tool = 0);
+    Tool* tool() const { return _tool; }
 private:
     Tool* _tool = 0;
 
@@ -95,13 +96,8 @@ private:
     //--------------
 public:
     QItemSelectionModel* selectionModel() const { return _selectionModel; }
-    QList<Object*> selectedObjects();
-
-    /**
-     * @brief selectedObjectsConst same as selectedObjectsConst but slower and const because this function does not uses caching.
-     * @return selected objects
-     */
-    QList<Object*> selectedObjectsConst() const;
+    QList<Object*> selectedObjects() const;
+    void updateSelection();
 
     bool isSelected(Object* o);
     void select(quint64 id, bool s = true);
@@ -115,7 +111,6 @@ public:
 
 private:
     QItemSelectionModel* _selectionModel = 0;
-    bool _selectionUpToDate = false;
     QList<Object*> _selection;
 
     //-------------------------
@@ -145,6 +140,7 @@ public slots:
      */
     void takeSnapshot();
 public:
+    bool blockSnapshots = false;
     void setUndoHandler(UndoHandler* uh) { _undoHandler = uh; }
 private:
     UndoHandler* _undoHandler;

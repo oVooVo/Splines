@@ -162,7 +162,11 @@ bool MainWindow::load()
 
 void MainWindow::setScene(Scene *scene)
 {
+    QString toolName;
     if (_scene) {
+        if (_scene->tool())
+            toolName = _scene->tool()->metaObject()->className();
+
         for (Manager* manager : _scene->managers()) {
             manager->setScene(scene);
         }
@@ -179,11 +183,13 @@ void MainWindow::setScene(Scene *scene)
             updateWindowTitle();
         });
 
-        connect(_scene, &Scene::destroyed, [this]() {
-            for (QAction* a : _checkableActions)
-                a->setChecked(false);
-        });
+//        connect(_scene, &Scene::destroyed, [this]() {
+//            for (QAction* a : _checkableActions)
+//                a->setChecked(false);
+//        });
 
+        if (!toolName.isEmpty())
+            _scene->setTool(Tool::createInstance(toolName));
         _isSaved = true;
         updateWindowTitle();
     }

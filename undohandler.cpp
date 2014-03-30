@@ -69,8 +69,10 @@ void UndoHandler::redo()
     _undoStack.push(saveScene(_currentScene));
     emit canUndo(true);
 
+    //QString tool = _currentScene->tool()->metaObject()->className();
     _currentScene = readScene(_redoStack.pop());
     _currentScene->setUndoHandler(this);
+    //_currentScene->setTool(Tool::createInstance(tool));
 
     emit currentSceneChanged(_currentScene);
 

@@ -140,14 +140,16 @@ void Spline::drawIndividual(QPainter &painter)
     painter.setPen(pen);
     int n = 100;
     for (int i = 0; i <= n; i++) {
-        if (isSelected())
+        if (isSelected()) {
             painter.setPen(
                         lerp(
                             Preferences::value<ColorAttribute>("colors.spline.active.start")->color(),
                             Preferences::value<ColorAttribute>("colors.spline.active.end")->color(),
                             (double) i / n
                     ));
-        else painter.setPen(Preferences::value<ColorAttribute>("colors.spline.inactive")->color());
+        } else {
+            painter.setPen(Preferences::value<ColorAttribute>("colors.spline.inactive")->color());
+        }
         painter.drawLine(at(i/(n + 1.0)), at((i+1.0)/(n+1.0)));
     }
     for (Point* p : points()) {
